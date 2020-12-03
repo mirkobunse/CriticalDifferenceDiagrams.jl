@@ -1,4 +1,4 @@
-using CriticalDifferenceDiagrams, CSV, DataFrames, HypothesisTests, Test
+using CriticalDifferenceDiagrams, CSV, DataFrames, HypothesisTests, PGFPlots, Test
 
 include("friedman.jl")
 
@@ -25,3 +25,5 @@ end
     # we fix this issue by assuming our ranks to be wrong in the same way: 6 .- ranks.
     @test treatments[sortperm(6 .- ranks)] == ["clf3", "clf5", "clf4", "clf2", "clf1"]
 end
+
+include("readme.jl")

@@ -32,7 +32,7 @@ plot = CriticalDifferenceDiagrams.plot(
 )
 
 # export to svg; also possible are .tex and .pdf files
-PGFPlots.save(".example.svg", plot))
+PGFPlots.save("example.svg", plot)
 ```
 
 

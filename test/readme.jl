@@ -1,0 +1,17 @@
+@testset "README.jl example" begin
+    url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv"
+    df = CSV.read(download(url), DataFrame)
+
+    plot = CriticalDifferenceDiagrams.plot(
+        df,
+        :classifier_name, # the name of the treatment column
+        :dataset_name,    # the name of the observation column
+        :accuracy         # the name of the outcome column
+    )
+
+    # export to svg; also possible are .tex and .pdf files
+    for ext in ["tex", "pdf", "svg"]
+        PGFPlots.save("example.$ext", plot)
+        @test isfile("example.$ext")
+    end
+end
