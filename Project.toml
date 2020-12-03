@@ -12,3 +12,20 @@ MultipleTesting = "f8716d33-7c4a-5097-896f-ce0ecbd3ef6b"
 PGFPlots = "3b7a836e-365b-5785-a47d-02c71176b4aa"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+
+[compat]
+DataFrames = "0.21"
+Distributions = "0.23"
+Graphs = "0.10"
+HypothesisTests = "0.10"
+MultipleTesting = "0.4"
+PGFPlots = "3.3"
+Requires = "1.1"
+julia = "1"
+
+[extras]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["CSV", "Test"]

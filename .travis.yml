@@ -1,0 +1,24 @@
+## Documentation: http://docs.travis-ci.com/user/languages/julia/
+language: julia
+os:
+  - linux
+  - osx
+  - windows
+julia:
+  - 1.0
+  - 1.5
+  - nightly
+notifications:
+  email: false
+git:
+  depth: 99999999
+matrix:
+  allow_failures:
+    - os: windows
+    - julia:
+        - 1.0
+        - nightly
+
+# push coverage results to Codecov
+after_success:
+  - julia -e 'cd(Pkg.dir("CriticalDifferenceDiagrams")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
