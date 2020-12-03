@@ -1,4 +1,4 @@
-export ChisqFriedmanTest, FDistFriedmanTest, FriedmanTest
+export average_ranks, ChisqFriedmanTest, FDistFriedmanTest, FriedmanTest
 
 using HypothesisTests: HypothesisTest, tiedrank_adj
 
@@ -91,6 +91,14 @@ function rank_with_average_ties(X::AbstractMatrix{T}) where T <: Real
     end
     return R
 end
+
+"""
+    average_ranks(x) where x <: FriedmanTest
+
+Return the average ranks of methods in the `FriedmanTest`.
+"""
+average_ranks(x::FDistFriedmanTest) = x.chisq.r
+average_ranks(x::ChisqFriedmanTest) = x.r
 
 HypothesisTests.pvalue(x::FDistFriedmanTest) = pvalue(FDist(x.df_1, x.df_2), x.F; tail=:right)
 HypothesisTests.pvalue(x::ChisqFriedmanTest) = pvalue(Chisq(x.df), x.F; tail=:right)

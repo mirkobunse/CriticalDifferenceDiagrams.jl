@@ -6,20 +6,52 @@ include("friedman.jl") # should be migrated to HypothesisTests.jl
 
 const PairwiseTest = NamedTuple{(:i, :j, :p),Tuple{Int64,Int64,Float64}} # type alias
 
+_DOC = """
+The input data are arranged in treatments `t_i => x_i`, each of which has a name `t_i` and
+`n` associated observations `x_i`. You can omit the names, either providing the separate
+`x_i` alone or by providing all observations as a single `(n, k)`-shaped matrix `X`.
+
+The analysis starts with a `FriedmanTest` to check if any of the treatments differ. If so,
+the differences between each pair of treatments is checked with a Holm-adjusted Wilcoxon
+`SignedRankTest`. The cliques represent groups of treatments which are not significantly
+distinguishable from each other.
+
+# kwargs
+
+- `alpha=0.05` is the significance level in the hypothesis tests.
+""" # basic documentation
+
 """
+    plot(t_1 => x_1, t_2 => x_2, ..., t_k =>  x_k; kwargs...)
     plot(x_1, x_2, ..., x_k; kwargs...)
     plot(X; kwargs...)
 
 Plot a critical difference diagram for `n` repeated observations of `k` treatments.
-The observations are arranged in `k` vectors `x_i` of `n` observations each or in
-an `(n, k)`-shaped matrix `X`.
 
-# kwargs
-
-- `alpha=0.05` is the significance level in the `FriedmanTest`.
-- `names=["t1", "t2", ..., "tk"]` are the names of the `k` treatments.
+$(_DOC)
 """
-function plot(X::AbstractMatrix{T}; alpha::Float64=0.05, names::Vector{String}=_defaultnames(size(X, 2))) where T <: Real
+function plot end
+
+"""
+    ranks_and_cliques(t_1 => x_1, t_2 => x_2, ..., t_k =>  x_k; kwargs...)
+    ranks_and_cliques(x_1, x_2, ..., x_k; kwargs...)
+    ranks_and_cliques(X; kwargs...)
+
+Return a tuple `(avg_ranks, cliques)` of the average ranks of `k` treatments in
+`n` repeated observations, together with the cliques of indistinguishable treatments.
+
+$(_DOC)
+"""
+function ranks_and_cliques(x::Pair{String, T}...; kwargs...) where T <: AbstractVector
+    x_keys, x_values = collect.(zip(x...)) # split pairs
+    ranks, cliques = ranks_and_cliques(x_values...; kwargs...)
+    return x_keys .=> ranks, map(clique -> x_keys[clique], cliques)
+end
+
+ranks_and_cliques(x::AbstractVector{T}...; kwargs...) where T <: Real =
+    ranks_and_cliques(hcat(x...); kwargs...)
+
+function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05) where T <: Real
     # test whether there are differences at all
     friedman = FriedmanTest(X)
     if pvalue(friedman) >= alpha
@@ -33,10 +65,8 @@ function plot(X::AbstractMatrix{T}; alpha::Float64=0.05, names::Vector{String}=_
     )
 
     # find max-cliques of indistinguishable methods
-    cliques = _indistinguishable_cliques(P, size(X, 2), alpha)
-    return map(clique -> names[clique], cliques) # TODO plot instead of returning the cliques
+    return average_ranks(friedman), _indistinguishable_cliques(P, size(X, 2), alpha)
 end
-plot(x::AbstractVector{T}...; kwargs...) where T <: Real = plot(hcat(x...); kwargs...)
 
 function _indistinguishable_cliques(P::Vector{PairwiseTest}, k::Int, alpha::Float64)
     g = simple_graph(k; is_directed=false)
