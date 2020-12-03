@@ -1,6 +1,6 @@
 module CriticalDifferenceDiagrams
 
-using Distributions, Graphs, HypothesisTests, MultipleTesting, Requires, Statistics
+using Distributions, Graphs, HypothesisTests, MultipleTesting, PGFPlots, Requires, Statistics
 
 function __init__()
     @require DataFrames="a93c6f00-e57d-5684-b7b6-d8193f3e46c0" include("dataframes.jl")
@@ -27,15 +27,66 @@ distinguishable from each other.
 
 """
     plot(t_1 => x_1, t_2 => x_2, ..., t_k =>  x_k; kwargs...)
-    plot(x_1, x_2, ..., x_k; kwargs...)
-    plot(X; kwargs...)
     plot(df, treatment, observation, outcome; kwargs...)
 
-Plot a critical difference diagram for `n` repeated observations of `k` treatments.
+Return a `PGFPlots` axis which contains a critical difference diagram for `n` repeated
+observations of `k` treatments.
 
 $(_DOC)
 """
-function plot end
+function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, kwargs...) where T <: AbstractVector
+    treatments, outcomes = collect.(zip(x...)) # separate the pairs
+    ranks, cliques = ranks_and_cliques(outcomes...)
+    k = length(treatments)
+    c = length(cliques)
+
+    # axis with one layer per clustering
+    changepoint = ceil(Int, k/2) # where to change from left to right
+    a = Axis(style = _axis_style(k, changepoint), title=title)
+    for (i, j) in enumerate(sortperm(ranks))
+        push!(a, _treatment_command(
+            treatments[j],
+            ranks[j],
+            (i <= changepoint ? 1 : k) * 1.0, # xpos is either 1 or k
+            (i <= changepoint ? i + 0.5 : k - i + (iseven(k) ? 1.5 : 2.0)) # ypos
+        ))
+    end
+    for i in 1:c
+        push!(a, _clique_command(
+            minimum(ranks[cliques[i]]),
+            maximum(ranks[cliques[i]]),
+            1.5 * (1 - i / (c+1))
+        ))
+    end
+    return a
+end
+
+_axis_style(k::Int, changepoint) =
+    join([
+        "axis x line=center",
+        "axis y line=none",
+        "xmin=1",
+        "xmax=$(k)",
+        "ymin=-$(changepoint+1)",
+        "ymax=0",
+        "scale only axis",
+        "height=$(changepoint+2)\\baselineskip",
+        "width=\\axisdefaultwidth",
+        "ticklabel style={anchor=south, yshift=3pt, font=\\small}",
+        "every tick/.style={thin}",
+        "axis line style={-}",
+        "title style={yshift=\\baselineskip}"
+    ], ", ") * (k <= 5 ? ", xtick={$(join(1:k, ","))}" : "")
+_treatment_command(label::String, rank::Float64, xpos::Float64, ypos::Float64) =
+    Plots.Command(join([
+        "\\draw (axis cs:$rank, 0) |- (axis cs:$xpos, -$ypos)",
+        " node[font=\\small, fill=white, inner sep=5pt, outer sep=-5pt, anchor=$(xpos==1 ? "west" : "east")]",
+        " {$label}"
+    ]))
+_clique_command(minrank::Float64, maxrank::Float64, ypos::Float64) =
+    Plots.Command(join([
+        "\\draw[ultra thick] (axis cs:$minrank, -$ypos) -- (axis cs:$maxrank, -$ypos)"
+    ]))
 
 """
     ranks_and_cliques(t_1 => x_1, t_2 => x_2, ..., t_k =>  x_k; kwargs...)
@@ -108,7 +159,5 @@ function _pairwise_tests(X::AbstractMatrix{T}, test_constructor::Function) where
     end
     return sort!(P; lt = (a, b)->isless(a.p, b.p)) # sort by p-value
 end
-
-_defaultnames(k) = ["t$i" for i in 1:k]
 
 end # module
