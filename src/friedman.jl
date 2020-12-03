@@ -5,10 +5,11 @@ using HypothesisTests: HypothesisTest, tiedrank_adj
 FRIEDMAN_DOC = """
    Test the null hypothesis that `n` repeated observations of a set of `k` treatments
    have the same distribution across all treatments. These observations are arranged
-   in the `(n, k)`-shaped matrix `X`.
+   in `k` vectors `x_i` of `n` observations each or in an `(n, k)`-shaped matrix `X`.
 """ # basic documentation
 
 """
+    FriedmanTest(x_1, x_2, ..., x_k) = FDistFriedmanTest(x_1, x_2, ..., x_k)
     FriedmanTest(X) = FDistFriedmanTest(X)
 
 $(FRIEDMAN_DOC)
@@ -19,9 +20,11 @@ The default version of this test, the `FDistFriedmanTest`, uses an F-distributed
 """
 abstract type FriedmanTest <: HypothesisTest end
 
-FriedmanTest(X::Matrix{T}) where T <: Real = FDistFriedmanTest(X)
+FriedmanTest(X::AbstractMatrix{T}) where T <: Real = FDistFriedmanTest(X)
+FriedmanTest(x::AbstractVector{T}...) where T <: Real = FDistFriedmanTest(x...)
 
 """
+    FDistFriedmanTest(x_1, x_2, ..., x_k)
     FDistFriedmanTest(X)
 
 $(FRIEDMAN_DOC)
@@ -36,6 +39,7 @@ struct FDistFriedmanTest <: FriedmanTest
 end
 
 """
+    ChisqFriedmanTest(x_1, x_2, ..., x_k)
     ChisqFriedmanTest(X)
 
 $(FRIEDMAN_DOC)
@@ -49,8 +53,10 @@ struct ChisqFriedmanTest <: FriedmanTest
     n::Int # number of observations per treatment
     k::Int # number of treatments
 end
+ChisqFriedmanTest(x::AbstractVector{T}...) where T <: Real =
+    ChisqFriedmanTest(hcat(x...))
 
-function FDistFriedmanTest(X::Matrix{T}) where T <: Real
+function FDistFriedmanTest(X::AbstractMatrix{T}) where T <: Real
     chisq = ChisqFriedmanTest(X)
     return FDistFriedmanTest(
         (chisq.n - 1) * chisq.F / (chisq.n * (chisq.k - 1) - chisq.F),
@@ -59,21 +65,26 @@ function FDistFriedmanTest(X::Matrix{T}) where T <: Real
         (chisq.k-1)*(chisq.n-1)
     ) # test statistic with k-1 and (k-1)*(n-1) degrees of freedom
 end
+FDistFriedmanTest(x::AbstractVector{T}...) where T <: Real =
+    FDistFriedmanTest(hcat(x...))
 
-function ChisqFriedmanTest(X::Matrix{T}) where T <: Real
+function ChisqFriedmanTest(X::AbstractMatrix{T}) where T <: Real
     n = size(X, 1)
     k = size(X, 2)
-    r = mean(rank_with_average_ties(X); dims=1)[:] # average rank of each method
+    if k < 3
+        throw(ArgumentError("The Friedman test requires at least 3 treatments; only $k were given"))
+    end
+    r = mean(rank_with_average_ties(X); dims=1) # average rank of each method
     return ChisqFriedmanTest(
         12*n/(k*(k+1)) * sum((r .- (k+1)/2).^2),
         k-1,
-        r,
+        vec(r), # convert row-matrix to vector
         n,
         k
     ) # test statistic with k-1 degrees of freedom
 end
 
-function rank_with_average_ties(X::Matrix{T}) where T <: Real
+function rank_with_average_ties(X::AbstractMatrix{T}) where T <: Real
     R = zeros(size(X))
     @inbounds for i in 1:size(X, 1)
         R[i, :], _ = tiedrank_adj(X[i, :]) # ranking for the i-th observation
