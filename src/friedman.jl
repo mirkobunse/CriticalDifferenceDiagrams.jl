@@ -2,14 +2,20 @@ export ChisqFriedmanTest, FDistFriedmanTest, FriedmanTest
 
 using HypothesisTests: HypothesisTest, tiedrank_adj
 
-# https://github.com/scipy/scipy/blob/v1.5.4/scipy/stats/stats.py#L7236-L7298
-# friedman_p_value_1 = ccdf(Chisq(df), friedman_statistic)
-# friedman_p_value_2 = ccdf(FDist(df_1, df_2), improved_statistic)
-# if friedman_p_value >= alpha error("Reject") end
+FRIEDMAN_DOC = """
+   Test the null hypothesis that `n` repeated observations of a set of `k` treatments
+   have the same distribution across all treatments. These observations are arranged
+   in the `(n, k)`-shaped matrix `X`.
+""" # basic documentation
 
 """
-   FriedmanTest(X)
+    FriedmanTest(X) = FDistFriedmanTest(X)
 
+$(FRIEDMAN_DOC)
+
+The default version of this test, the `FDistFriedmanTest`, uses an F-distributed statistic.
+
+**See also:** `FDistFriedmanTest`, `ChisqFriedmanTest`
 """
 abstract type FriedmanTest <: HypothesisTest end
 
@@ -18,7 +24,9 @@ FriedmanTest(X::Matrix{T}) where T <: Real = FDistFriedmanTest(X)
 """
     FDistFriedmanTest(X)
 
-`X` has shape `(n_observations, n_treatments)`.
+$(FRIEDMAN_DOC)
+
+This version of the `FriedmanTest` uses an F-distributed statistic.
 """
 struct FDistFriedmanTest <: FriedmanTest
     F::Float64 # test statistic
@@ -30,7 +38,9 @@ end
 """
     ChisqFriedmanTest(X)
 
-`X` has shape `(n_observations, n_treatments)`.
+$(FRIEDMAN_DOC)
+
+This version of the `FriedmanTest` uses a χ²-distributed statistic.
 """
 struct ChisqFriedmanTest <: FriedmanTest
     F::Float64 # test statistic
