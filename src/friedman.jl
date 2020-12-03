@@ -15,50 +15,45 @@ using HypothesisTests: HypothesisTest, tiedrank_adj
 struct ChisqFriedmanTest <: HypothesisTest
     F::Float64 # test statistic
     df::Int # number of degrees of freedom
-    R::Vector{Float64} # average ranks
-    N::Int # number of observations per treatment
+    r::Vector{Float64} # average ranks
+    n::Int # number of observations per treatment
     k::Int # number of treatments
 end
 
 function ChisqFriedmanTest(X::Matrix{T}) where T <: Real
-    N = size(X, 1)
+    n = size(X, 1)
     k = size(X, 2)
-
-    # rank
-    r = rank_with_average_ties(X)
-    R = mean(r; dims=1)[:] # average rank of each method
-
-    # compute the test statistic with k-1 degrees of freedom
+    r = mean(rank_with_average_ties(X); dims=1)[:] # average rank of each method
     return ChisqFriedmanTest(
-        12*N/(k*(k+1)) * sum(R.^2 .- (k*(k+1)^2/4)),
+        12*n/(k*(k+1)) * sum((r .- (k+1)/2).^2),
         k-1,
-        R,
-        N,
+        r,
+        n,
         k
-    )
+    ) # test statistic with k-1 degrees of freedom
 end
 
 function rank_with_average_ties(X::Matrix{T}) where T <: Real
-	r = zeros(size(X))
+	R = zeros(size(X))
 	@inbounds for i in 1:size(X, 1)
-	    r[i, :], _ = tiedrank_adj(X[i, :]) # ranking for the i-th observation
+	    R[i, :], _ = tiedrank_adj(X[i, :]) # ranking for the i-th observation
     end
-    return r
+    return R
 end
 
 HypothesisTests.pvalue(x::ChisqFriedmanTest) = pvalue(Chisq(x.df), x.F; tail=:right)
 
-HypothesisTests.testname(::ChisqFriedmanTest) = "Friedman test with Chi-square statistic"
+HypothesisTests.testname(::ChisqFriedmanTest) = "Friedman test with χ²-statistic"
 HypothesisTests.population_param_of_interest(x::ChisqFriedmanTest) =
-    ("Average rank of treatments", "all equal", NaN) # = (name, value under h0, point estimate)
+    ("Average ranks of treatments", "all equal", NaN) # = (name, value under h0, point estimate)
 HypothesisTests.default_tail(test::ChisqFriedmanTest) = :right
 
 function HypothesisTests.show_params(io::IO, x::ChisqFriedmanTest, indent)
     println(io, indent, "number of treatments:                 ", x.k)
-    println(io, indent, "number of observations per treatment: ", x.N)
+    println(io, indent, "number of observations per treatment: ", x.n)
     println(io, indent, "χ²-statistic:                         ", x.F)
     print(io, indent,   "average ranks:                        ")
-    show(io, x.R)
+    show(io, x.r)
     println(io)
     println(io, indent, "number of degrees of freedom:         ", x.df)
 end
