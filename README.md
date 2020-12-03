@@ -1,9 +1,8 @@
 # Critical difference diagrams in Julia
 
-CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This Julia package generates Tikz code to produce CD diagrams as publication-ready vector graphics.
+CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This Julia package generates Tikz code to produce publication-ready vector graphics.
 
 ![Alt text](./.example.svg)
-<img src="./.example.svg">
 
 The above example is adapted from https://github.com/hfawaz/cd-diagram. The position of the treatments `clf1` to `clf5` represents their mean ranks across all outcomes of the observations, where low ranks indicate that a treatment wins more often than its competitors with higher ranks. Two or more treatments are connected with each other if we can not tell their outcomes apart, in the sense of statistical significance. For the above example, we can not tell from the data whether `clf3` and `clf5` are actually different from each other. We can tell, however, that both of them are different from all of the other treatments.
 
@@ -16,7 +15,7 @@ A CD diagram concisely represents multiple hypothesis tests that are conducted o
 ] add https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl
 ```
 
-Having installed the package with the above code, we can proceed with generating the plot
+Having installed the package, we can proceed with generating the plot:
 
 ```julia
 using CriticalDifferenceDiagrams, CSV, DataFrames, PGFPlots
@@ -39,7 +38,7 @@ PGFPlots.save(".example.svg", plot))
 
 ## Cautions
 
-The hypothesis tests underneath the CD diagram do not account for variances of the outcomes. It is therefore important that these outcomes are "reliable" in the sense that each of them is obtained from a sufficiently large sample. Moreover, all treatments must have been evaluated with identical observations. Ideally, the outcomes come from a cross validation or from a repeated stratified split.
+The hypothesis tests underneath the CD diagram do not account for variances of the outcomes. It is therefore important that these outcomes are "reliable" in the sense that each of them is obtained from a sufficiently large sample. Ideally, they come from a cross validation or from a repeated stratified split. Moreover, all treatments must have been evaluated on the same set of observations.
 
 
 ## Citing
