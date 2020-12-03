@@ -1,15 +1,19 @@
 module CriticalDifferenceDiagrams
 
-using Distributions, Graphs, HypothesisTests, MultipleTesting, Statistics
+using Distributions, Graphs, HypothesisTests, MultipleTesting, Requires, Statistics
+
+function __init__()
+    @require DataFrames="a93c6f00-e57d-5684-b7b6-d8193f3e46c0" include("dataframes.jl")
+end
 
 include("friedman.jl") # should be migrated to HypothesisTests.jl
-
-const PairwiseTest = NamedTuple{(:i, :j, :p),Tuple{Int64,Int64,Float64}} # type alias
 
 _DOC = """
 The input data are arranged in treatments `t_i => x_i`, each of which has a name `t_i` and
 `n` associated observations `x_i`. You can omit the names, either providing the separate
 `x_i` alone or by providing all observations as a single `(n, k)`-shaped matrix `X`.
+Alternatively, you can provide a DataFrame `df` with the columns `treatment`, `observation`,
+and `outcome`.
 
 The analysis starts with a `FriedmanTest` to check if any of the treatments differ. If so,
 the differences between each pair of treatments is checked with a Holm-adjusted Wilcoxon
@@ -25,6 +29,7 @@ distinguishable from each other.
     plot(t_1 => x_1, t_2 => x_2, ..., t_k =>  x_k; kwargs...)
     plot(x_1, x_2, ..., x_k; kwargs...)
     plot(X; kwargs...)
+    plot(df, treatment, observation, outcome; kwargs...)
 
 Plot a critical difference diagram for `n` repeated observations of `k` treatments.
 
@@ -36,6 +41,7 @@ function plot end
     ranks_and_cliques(t_1 => x_1, t_2 => x_2, ..., t_k =>  x_k; kwargs...)
     ranks_and_cliques(x_1, x_2, ..., x_k; kwargs...)
     ranks_and_cliques(X; kwargs...)
+    ranks_and_cliques(df, treatment, observation, outcome; kwargs...)
 
 Return a tuple `(avg_ranks, cliques)` of the average ranks of `k` treatments in
 `n` repeated observations, together with the cliques of indistinguishable treatments.
@@ -68,7 +74,9 @@ function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05) where T <:
     return average_ranks(friedman), _indistinguishable_cliques(P, size(X, 2), alpha)
 end
 
-function _indistinguishable_cliques(P::Vector{PairwiseTest}, k::Int, alpha::Float64)
+const _PairwiseTest = NamedTuple{(:i, :j, :p),Tuple{Int64,Int64,Float64}} # type alias
+
+function _indistinguishable_cliques(P::Vector{_PairwiseTest}, k::Int, alpha::Float64)
     g = simple_graph(k; is_directed=false)
     for P_k in P
         if P_k.p >= alpha
@@ -78,7 +86,7 @@ function _indistinguishable_cliques(P::Vector{PairwiseTest}, k::Int, alpha::Floa
     return maximal_cliques(g)
 end
 
-function _adjust_pairwise_tests!(P::Vector{PairwiseTest}, method::PValueAdjustment)
+function _adjust_pairwise_tests!(P::Vector{_PairwiseTest}, method::PValueAdjustment)
     adjusted_p = adjust(map(x->x.p, P), method)
     @inbounds for k in 1:length(P)
         P[k] = (; i=P[k].i, j=P[k].j, p=adjusted_p[k])
@@ -89,7 +97,7 @@ end
 # the test_constructor must have two arguments and result in a HypothesisTest object
 function _pairwise_tests(X::AbstractMatrix{T}, test_constructor::Function) where T <: Real
     k = size(X, 2) # number of treatments
-    P = PairwiseTest[]
+    P = _PairwiseTest[]
     for i in 1:k, j in i:k # for each pair of treatments
         push!(P, (;
             i = i,
