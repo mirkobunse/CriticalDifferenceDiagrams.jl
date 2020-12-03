@@ -51,7 +51,8 @@ $(_DOC)
 function ranks_and_cliques(x::Pair{String, T}...; kwargs...) where T <: AbstractVector
     x_keys, x_values = collect.(zip(x...)) # split pairs
     ranks, cliques = ranks_and_cliques(x_values...; kwargs...)
-    return x_keys .=> ranks, map(clique -> x_keys[clique], cliques)
+    rankperm = sortperm(ranks)
+    return x_keys[rankperm] .=> ranks[rankperm], map(clique -> x_keys[clique], cliques)
 end
 
 ranks_and_cliques(x::AbstractVector{T}...; kwargs...) where T <: Real =
