@@ -103,7 +103,7 @@ function _pairwise_tests(X::AbstractMatrix{T}, test_constructor::Function) where
         push!(P, (;
             i = i,
             j = j,
-            p = pvalue(test_constructor(X[:, i], X[:, j]))
+            p = clamp(pvalue(test_constructor(X[:, i], X[:, j])), 0, 1)
         )) # NamedTuple with keys i, j, and p
     end
     return sort!(P; lt = (a, b)->isless(a.p, b.p)) # sort by p-value
