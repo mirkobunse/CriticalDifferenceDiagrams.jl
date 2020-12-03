@@ -1,3 +1,3 @@
-using CriticalDifferenceDiagrams, Test
+using CriticalDifferenceDiagrams, HypothesisTests, Test
 
 include("friedman.jl")
