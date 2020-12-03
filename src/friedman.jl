@@ -6,7 +6,7 @@ FRIEDMAN_DOC = """
    Test the null hypothesis that `n` repeated observations of a set of `k` treatments
    have the same distribution across all treatments. These observations are arranged
    in `k` vectors `x_i` of `n` observations each or in an `(n, k)`-shaped matrix `X`.
-""" # basic documentation
+""" # documentation that is shared across subtypes of FriedmanTest
 
 """
     FriedmanTest(x_1, x_2, ..., x_k) = FDistFriedmanTest(x_1, x_2, ..., x_k)
@@ -19,24 +19,6 @@ The default version of this test, the `FDistFriedmanTest`, uses an F-distributed
 **See also:** `FDistFriedmanTest`, `ChisqFriedmanTest`
 """
 abstract type FriedmanTest <: HypothesisTest end
-
-FriedmanTest(X::AbstractMatrix{T}) where T <: Real = FDistFriedmanTest(X)
-FriedmanTest(x::AbstractVector{T}...) where T <: Real = FDistFriedmanTest(x...)
-
-"""
-    FDistFriedmanTest(x_1, x_2, ..., x_k)
-    FDistFriedmanTest(X)
-
-$(FRIEDMAN_DOC)
-
-This version of the `FriedmanTest` uses an F-distributed statistic.
-"""
-struct FDistFriedmanTest <: FriedmanTest
-    F::Float64 # test statistic
-    chisq::ChisqFriedmanTest
-    df_1::Int # degrees of freedom (first dimension)
-    df_2::Int # second dimension
-end
 
 """
     ChisqFriedmanTest(x_1, x_2, ..., x_k)
@@ -53,20 +35,24 @@ struct ChisqFriedmanTest <: FriedmanTest
     n::Int # number of observations per treatment
     k::Int # number of treatments
 end
-ChisqFriedmanTest(x::AbstractVector{T}...) where T <: Real =
-    ChisqFriedmanTest(hcat(x...))
 
-function FDistFriedmanTest(X::AbstractMatrix{T}) where T <: Real
-    chisq = ChisqFriedmanTest(X)
-    return FDistFriedmanTest(
-        (chisq.n - 1) * chisq.F / (chisq.n * (chisq.k - 1) - chisq.F),
-        chisq,
-        chisq.k-1,
-        (chisq.k-1)*(chisq.n-1)
-    ) # test statistic with k-1 and (k-1)*(n-1) degrees of freedom
+"""
+    FDistFriedmanTest(x_1, x_2, ..., x_k)
+    FDistFriedmanTest(X)
+
+$(FRIEDMAN_DOC)
+
+This version of the `FriedmanTest` uses an F-distributed statistic.
+"""
+struct FDistFriedmanTest <: FriedmanTest
+    F::Float64 # test statistic
+    chisq::ChisqFriedmanTest
+    df_1::Int # degrees of freedom (first dimension)
+    df_2::Int # second dimension
 end
-FDistFriedmanTest(x::AbstractVector{T}...) where T <: Real =
-    FDistFriedmanTest(hcat(x...))
+
+FriedmanTest(X::AbstractMatrix{T}) where T <: Real = FDistFriedmanTest(X)
+FriedmanTest(x::AbstractVector{T}...) where T <: Real = FDistFriedmanTest(x...)
 
 function ChisqFriedmanTest(X::AbstractMatrix{T}) where T <: Real
     n = size(X, 1)
@@ -83,6 +69,20 @@ function ChisqFriedmanTest(X::AbstractMatrix{T}) where T <: Real
         k
     ) # test statistic with k-1 degrees of freedom
 end
+ChisqFriedmanTest(x::AbstractVector{T}...) where T <: Real =
+    ChisqFriedmanTest(hcat(x...))
+
+function FDistFriedmanTest(X::AbstractMatrix{T}) where T <: Real
+    chisq = ChisqFriedmanTest(X)
+    return FDistFriedmanTest(
+        (chisq.n - 1) * chisq.F / (chisq.n * (chisq.k - 1) - chisq.F),
+        chisq,
+        chisq.k-1,
+        (chisq.k-1)*(chisq.n-1)
+    ) # test statistic with k-1 and (k-1)*(n-1) degrees of freedom
+end
+FDistFriedmanTest(x::AbstractVector{T}...) where T <: Real =
+    FDistFriedmanTest(hcat(x...))
 
 function rank_with_average_ties(X::AbstractMatrix{T}) where T <: Real
     R = zeros(size(X))
