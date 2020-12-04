@@ -4,7 +4,7 @@
 
 CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This Julia package generates Tikz code to produce publication-ready vector graphics.
 
-<img alt=".example.svg" src="./.example.svg" style="width: 640px; max-width: 100%; margin-left: auto; margin-right: auto;">
+<img alt=".example.svg" src="./.example.svg" width="600">
 
 The above example is adapted from https://github.com/hfawaz/cd-diagram. The position of the treatments `clf1` to `clf5` represents their mean ranks across all outcomes of the observations, where low ranks indicate that a treatment wins more often than its competitors with higher ranks. Two or more treatments are connected with each other if we can not tell their outcomes apart, in the sense of statistical significance. For the above example, we can not tell from the data whether `clf3` and `clf5` are actually different from each other. We can tell, however, that both of them are different from all of the other treatments.
 
