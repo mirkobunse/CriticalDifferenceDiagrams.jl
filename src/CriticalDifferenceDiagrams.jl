@@ -35,8 +35,11 @@ Return a `PGFPlots` axis which contains a critical difference diagram for `n` re
 observations of `k` treatments.
 
 $(_DOC)
+- `title=nothing` is an optional string to be printed above the diagram.
+- `reverse_x=false` reverses the direction of the x axis from right-to-left (default) to
+  left-to-right.
 """
-function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, kwargs...) where T <: AbstractVector
+function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, reverse_x::Bool=false, kwargs...) where T <: AbstractVector
     treatments, outcomes = collect.(zip(x...)) # separate the pairs
     ranks, cliques = ranks_and_cliques(outcomes...; kwargs...)
     k = length(treatments)
@@ -44,26 +47,34 @@ function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, kwarg
 
     # axis with one layer per clustering
     changepoint = ceil(Int, k/2) # where to change from left to right
-    a = Axis(style = _axis_style(k, changepoint), title=title)
+    a = Axis(style = _axis_style(k, changepoint, reverse_x), title=title)
+    if !reverse_x && !iseven(k)
+        changepoint -= 1
+    end
     for (i, j) in enumerate(sortperm(ranks))
         push!(a, _treatment_command(
             treatments[j],
             ranks[j],
             (i <= changepoint ? 1 : k) * 1.0, # xpos is either 1 or k
-            (i <= changepoint ? i + 0.5 : k - i + (iseven(k) ? 1.5 : 2.0)) # ypos
+            if reverse_x
+                0.5 + (i <= changepoint ? i : k - i + (iseven(k) ? 1.0 : 1.5))
+            else
+                (iseven(k) ? 0.0 : 0.5) + (i <= changepoint ? i + 0.5 : k - i + (iseven(k) ? 1.5 : 1.0))
+            end, # ypos
+            reverse_x
         ))
     end
     for i in 1:c
         push!(a, _clique_command(
             minimum(ranks[cliques[i]]),
             maximum(ranks[cliques[i]]),
-            1.5 * (1 - i / (c+1))
+            1.5 * i / (c+1)
         ))
     end
     return a
 end
 
-_axis_style(k::Int, changepoint) =
+_axis_style(k::Int, changepoint::Int, reverse_x::Bool) =
     join([
         "axis x line=center",
         "axis y line=none",
@@ -78,16 +89,24 @@ _axis_style(k::Int, changepoint) =
         "every tick/.style={thin}",
         "axis line style={-}",
         "title style={yshift=\\baselineskip}"
-    ], ", ") * (k <= 5 ? ", xtick={$(join(1:k, ","))}" : "")
-_treatment_command(label::String, rank::Float64, xpos::Float64, ypos::Float64) =
+    ], ", ") *
+      (k <= 5 ? ", xtick={$(join(1:k, ","))}" : "") *
+      (reverse_x ? "" : ", x dir=reverse")
+_treatment_command(label::String, rank::Float64, xpos::Float64, ypos::Float64, reverse_x::Bool) =
     Plots.Command(join([
-        "\\draw (axis cs:$rank, 0) |- (axis cs:$xpos, -$ypos)",
-        " node[font=\\small, fill=white, inner sep=5pt, outer sep=-5pt, anchor=$(xpos==1 ? "west" : "east")]",
-        " {$label}"
+        "\\draw (axis cs:$rank, 0) |- (axis cs:$xpos, -$ypos) node[",
+        "font=\\small, fill=white, inner sep=5pt, outer sep=-5pt, anchor=$(_label_anchor(xpos, reverse_x))",
+        "] {$label}"
     ]))
+_label_anchor(xpos::Float64, reverse_x::Bool) = ["west", "east"][1 + (Int(xpos==1) + Int(reverse_x)) % 2]
+    # if reverse_x
+    #     xpos==1 ? "west" : "east"
+    # else
+    #     xpos==1 ? "east" : "west"
+    # end
 _clique_command(minrank::Float64, maxrank::Float64, ypos::Float64) =
     Plots.Command(join([
-        "\\draw[ultra thick] (axis cs:$minrank, -$ypos) -- (axis cs:$maxrank, -$ypos)"
+        "\\draw[ultra thick, line cap=round] (axis cs:$minrank, -$ypos) -- (axis cs:$maxrank, -$ypos)"
     ]))
 
 """
