@@ -80,13 +80,13 @@ _axis_style(k::Int, changepoint::Int, reverse_x::Bool) =
         "axis y line=none",
         "xmin=1",
         "xmax=$(k)",
-        "ymin=-$(changepoint+1)",
+        "ymin=-$(changepoint+1.5)",
         "ymax=0",
         "scale only axis",
         "height=$(changepoint+2)\\baselineskip",
         "width=\\axisdefaultwidth",
-        "ticklabel style={anchor=south, yshift=3pt, font=\\small}",
-        "every tick/.style={thin}",
+        "ticklabel style={anchor=south, yshift=1.33*\\pgfkeysvalueof{/pgfplots/major tick length}, font=\\small}",
+        "every tick/.style={yshift=.5*\\pgfkeysvalueof{/pgfplots/major tick length}}",
         "axis line style={-}",
         "title style={yshift=\\baselineskip}"
     ], ", ") *
@@ -94,8 +94,8 @@ _axis_style(k::Int, changepoint::Int, reverse_x::Bool) =
       (reverse_x ? "" : ", x dir=reverse")
 _treatment_command(label::String, rank::Float64, xpos::Float64, ypos::Float64, reverse_x::Bool) =
     Plots.Command(join([
-        "\\draw (axis cs:$rank, 0) |- (axis cs:$xpos, -$ypos) node[",
-        "font=\\small, fill=white, inner sep=5pt, outer sep=-5pt, anchor=$(_label_anchor(xpos, reverse_x))",
+        "\\draw[semithick, rounded corners=1pt] (axis cs:$rank, 0) |- (axis cs:$xpos, -$ypos) node[",
+        "font=\\small, fill=white, inner xsep=5pt, outer xsep=-5pt, anchor=$(_label_anchor(xpos, reverse_x))",
         "] {$label}"
     ]))
 _label_anchor(xpos::Float64, reverse_x::Bool) = ["west", "east"][1 + (Int(xpos==1) + Int(reverse_x)) % 2]
