@@ -161,7 +161,16 @@ function _indistinguishable_cliques(r::Vector{Float64}, P::Vector{_PairwiseTest}
             end # methods with edges are not distinguishable
         end
     end
-    return maximal_cliques(g)
+    cliques = maximal_cliques(g)
+    minranks = map(c -> minimum(r[c]), cliques)
+    maxranks = map(c -> maximum(r[c]), cliques)
+    dominated = map(1:length(cliques)) do i
+        any(.|(
+            .&(minranks .<= minranks[i], maxranks .> maxranks[i]),
+            .&(minranks .< minranks[i], maxranks .>= maxranks[i])
+        ))
+    end # cliques that are entirely contained in another clique
+    return cliques[.!(dominated)]
 end
 
 function _adjust_pairwise_tests!(P::Vector{_PairwiseTest}, method::PValueAdjustment)
@@ -176,7 +185,7 @@ end
 function _pairwise_tests(X::AbstractMatrix{T}, test_constructor::Function) where T <: Real
     k = size(X, 2) # number of treatments
     P = _PairwiseTest[]
-    for i in 1:k, j in i:k # for each pair of treatments
+    for i in 1:k, j in (i+1):k # for each pair of treatments
         push!(P, (;
             i = i,
             j = j,
