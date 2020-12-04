@@ -23,6 +23,8 @@ distinguishable from each other.
 # kwargs
 
 - `alpha=0.05` is the significance level in the hypothesis tests.
+- `maximize_outcome=false` specifies whether the ranks represent a maximization or a
+  minimization of the outcomes.
 """ # basic documentation
 
 """
@@ -36,7 +38,7 @@ $(_DOC)
 """
 function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, kwargs...) where T <: AbstractVector
     treatments, outcomes = collect.(zip(x...)) # separate the pairs
-    ranks, cliques = ranks_and_cliques(outcomes...)
+    ranks, cliques = ranks_and_cliques(outcomes...; kwargs...)
     k = length(treatments)
     c = length(cliques)
 
@@ -109,9 +111,9 @@ end
 ranks_and_cliques(x::AbstractVector{T}...; kwargs...) where T <: Real =
     ranks_and_cliques(hcat(x...); kwargs...)
 
-function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05) where T <: Real
+function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_outcome::Bool=false) where T <: Real
     # test whether there are differences at all
-    friedman = FriedmanTest(X)
+    friedman = FriedmanTest(X; maximize_outcome=maximize_outcome)
     if pvalue(friedman) >= alpha
         error("No significant differences between treatments at α=$alpha")
     end

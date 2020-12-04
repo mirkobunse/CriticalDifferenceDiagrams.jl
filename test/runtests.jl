@@ -12,7 +12,7 @@ function _getdata(url="https://raw.githubusercontent.com/hfawaz/cd-diagram/maste
 end
 
 @testset "ranks_and_cliques" begin
-    ranks, cliques = CriticalDifferenceDiagrams.ranks_and_cliques(_getdata()...)
+    ranks, cliques = CriticalDifferenceDiagrams.ranks_and_cliques(_getdata()...; maximize_outcome=true)
     treatments, ranks = collect.(zip(ranks...)) # separate the pairs
 
     # compare the cliques with those in https://github.com/hfawaz/cd-diagram
@@ -20,10 +20,7 @@ end
     @test Set(["clf4", "clf2", "clf1"]) in Set.(cliques)
 
     # compare the order of ranks with those in https://github.com/hfawaz/cd-diagram
-    #
-    # unfortunately, the axis on which the ranks are displayed there is the wrong way around;
-    # we fix this issue by assuming our ranks to be wrong in the same way: 6 .- ranks.
-    @test treatments[sortperm(6 .- ranks)] == ["clf3", "clf5", "clf4", "clf2", "clf1"]
+    @test treatments[sortperm(ranks)] == ["clf3", "clf5", "clf4", "clf2", "clf1"]
 end
 
 include("readme.jl")

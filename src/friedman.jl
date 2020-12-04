@@ -7,26 +7,36 @@ FRIEDMAN_DOC = """
    have the same distribution across all treatments. These observations are arranged
    in `k` vectors `x_i` of `n` observations each or in an `(n, k)`-shaped matrix `X`.
 """ # documentation that is shared across subtypes of FriedmanTest
+FRIEDMAN_KWARGS_DOC = """
+   # Keyword arguments
+   
+   - `maximize_outcome=false` specifies whether the ranks represent a maximization or a
+     minimization of the outcomes.
+"""
 
 """
-    FriedmanTest(x_1, x_2, ..., x_k) = FDistFriedmanTest(x_1, x_2, ..., x_k)
-    FriedmanTest(X) = FDistFriedmanTest(X)
+    FriedmanTest(x_1, x_2, ..., x_k; kwargs...) = FDistFriedmanTest(x_1, x_2, ..., x_k; kwargs...)
+    FriedmanTest(X; kwargs...) = FDistFriedmanTest(X; kwargs...)
 
 $(FRIEDMAN_DOC)
 
 The default version of this test, the `FDistFriedmanTest`, uses an F-distributed statistic.
 
 **See also:** `FDistFriedmanTest`, `ChisqFriedmanTest`
+
+$(FRIEDMAN_KWARGS_DOC)
 """
 abstract type FriedmanTest <: HypothesisTest end
 
 """
-    ChisqFriedmanTest(x_1, x_2, ..., x_k)
-    ChisqFriedmanTest(X)
+    ChisqFriedmanTest(x_1, x_2, ..., x_k; kwargs...)
+    ChisqFriedmanTest(X; kwargs...)
 
 $(FRIEDMAN_DOC)
 
 This version of the `FriedmanTest` uses a χ²-distributed statistic.
+
+$(FRIEDMAN_KWARGS_DOC)
 """
 struct ChisqFriedmanTest <: FriedmanTest
     F::Float64 # test statistic
@@ -34,15 +44,18 @@ struct ChisqFriedmanTest <: FriedmanTest
     r::Vector{Float64} # average ranks
     n::Int # number of observations per treatment
     k::Int # number of treatments
+    maximize_outcome::Bool # which optimization the ranks represent
 end
 
 """
-    FDistFriedmanTest(x_1, x_2, ..., x_k)
-    FDistFriedmanTest(X)
+    FDistFriedmanTest(x_1, x_2, ..., x_k; kwargs...)
+    FDistFriedmanTest(X; kwargs...)
 
 $(FRIEDMAN_DOC)
 
 This version of the `FriedmanTest` uses an F-distributed statistic.
+
+$(FRIEDMAN_KWARGS_DOC)
 """
 struct FDistFriedmanTest <: FriedmanTest
     F::Float64 # test statistic
@@ -51,29 +64,30 @@ struct FDistFriedmanTest <: FriedmanTest
     df_2::Int # second dimension
 end
 
-FriedmanTest(X::AbstractMatrix{T}) where T <: Real = FDistFriedmanTest(X)
-FriedmanTest(x::AbstractVector{T}...) where T <: Real = FDistFriedmanTest(x...)
+FriedmanTest(X::AbstractMatrix{T}; kwargs...) where T <: Real = FDistFriedmanTest(X; kwargs...)
+FriedmanTest(x::AbstractVector{T}...; kwargs...) where T <: Real = FDistFriedmanTest(x...; kwargs...)
 
-function ChisqFriedmanTest(X::AbstractMatrix{T}) where T <: Real
+function ChisqFriedmanTest(X::AbstractMatrix{T}; maximize_outcome::Bool=false) where T <: Real
     n = size(X, 1)
     k = size(X, 2)
     if k < 3
         throw(ArgumentError("The Friedman test requires at least 3 treatments; only $k were given"))
     end
-    r = mean(rank_with_average_ties(X); dims=1) # average rank of each method
+    r = mean(rank_with_average_ties(X, maximize_outcome); dims=1) # average rank of each method
     return ChisqFriedmanTest(
         12*n/(k*(k+1)) * sum((r .- (k+1)/2).^2),
         k-1,
         vec(r), # convert row-matrix to vector
         n,
-        k
+        k,
+        maximize_outcome
     ) # test statistic with k-1 degrees of freedom
 end
-ChisqFriedmanTest(x::AbstractVector{T}...) where T <: Real =
-    ChisqFriedmanTest(hcat(x...))
+ChisqFriedmanTest(x::AbstractVector{T}...; kwargs...) where T <: Real =
+    ChisqFriedmanTest(hcat(x...); kwargs...)
 
-function FDistFriedmanTest(X::AbstractMatrix{T}) where T <: Real
-    chisq = ChisqFriedmanTest(X)
+function FDistFriedmanTest(X::AbstractMatrix{T}; kwargs...) where T <: Real
+    chisq = ChisqFriedmanTest(X; kwargs...)
     return FDistFriedmanTest(
         (chisq.n - 1) * chisq.F / (chisq.n * (chisq.k - 1) - chisq.F),
         chisq,
@@ -84,10 +98,12 @@ end
 FDistFriedmanTest(x::AbstractVector{T}...) where T <: Real =
     FDistFriedmanTest(hcat(x...))
 
-function rank_with_average_ties(X::AbstractMatrix{T}) where T <: Real
+function rank_with_average_ties(X::AbstractMatrix{T}, maximize_outcome::Bool) where T <: Real
     R = zeros(size(X))
     @inbounds for i in 1:size(X, 1)
-        R[i, :], _ = tiedrank_adj(X[i, :]) # ranking for the i-th observation
+        R[i, :], _ = tiedrank_adj(
+            maximize_outcome ? -1 .* X[i, :] : X[i, :]
+        ) # ranking for the i-th observation, wrt maximization or minimization
     end
     return R
 end
@@ -113,6 +129,7 @@ function HypothesisTests.show_params(io::IO, x::FDistFriedmanTest, indent)
     println(io, indent, "number of treatments:                 ", x.chisq.k)
     println(io, indent, "number of observations per treatment: ", x.chisq.n)
     println(io, indent, "F-statistic:                          ", x.F)
+    println(io, indent, "optimization target of the ranks:     ", x.chisq.maximize_outcome ? "maximization" : "minimization")
     print(io, indent,   "average ranks:                        ")
     show(io, x.chisq.r)
     println(io)
@@ -123,6 +140,7 @@ function HypothesisTests.show_params(io::IO, x::ChisqFriedmanTest, indent)
     println(io, indent, "number of treatments:                 ", x.k)
     println(io, indent, "number of observations per treatment: ", x.n)
     println(io, indent, "χ²-statistic:                         ", x.F)
+    println(io, indent, "optimization target of the ranks:     ", x.maximize_outcome ? "maximization" : "minimization")
     print(io, indent,   "average ranks:                        ")
     show(io, x.r)
     println(io)

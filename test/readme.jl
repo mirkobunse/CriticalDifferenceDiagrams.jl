@@ -8,7 +8,8 @@
         df,
         :classifier_name, # the name of the treatment column
         :dataset_name,    # the name of the observation column
-        :accuracy         # the name of the outcome column
+        :accuracy;        # the name of the outcome column
+        maximize_outcome=true # compute ranks for minimization (default) or maximization
     )
 
     # export to svg; also possible are .tex and .pdf files
