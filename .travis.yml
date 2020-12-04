@@ -1,9 +1,7 @@
 ## Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
-os:
-  - linux
-  - osx
-  - windows
+sudo: required
+dist: trusty
 julia:
   - 1.0
   - 1.5
@@ -16,7 +14,6 @@ matrix:
   allow_failures:
     - julia: nightly
     - julia: 1.0
-    - os: windows
 
 # PDF and SVG export
 before_install:

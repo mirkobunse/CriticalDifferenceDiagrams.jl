@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/mirkobunse/CriticalDifferenceDiagrams.jl.svg?branch=master)](https://travis-ci.com/mirkobunse/CriticalDifferenceDiagrams.jl)
+
 # Critical difference diagrams in Julia
 
 CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This Julia package generates Tikz code to produce publication-ready vector graphics.
