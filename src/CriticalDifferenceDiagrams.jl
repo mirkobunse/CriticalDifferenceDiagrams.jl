@@ -144,16 +144,21 @@ function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_o
     )
 
     # find max-cliques of indistinguishable methods
-    return average_ranks(friedman), _indistinguishable_cliques(P, size(X, 2), alpha)
+    return average_ranks(friedman), _indistinguishable_cliques(average_ranks(friedman), P, size(X, 2), alpha)
 end
 
 const _PairwiseTest = NamedTuple{(:i, :j, :p),Tuple{Int64,Int64,Float64}} # type alias
 
-function _indistinguishable_cliques(P::Vector{_PairwiseTest}, k::Int, alpha::Float64)
+function _indistinguishable_cliques(r::Vector{Float64}, P::Vector{_PairwiseTest}, k::Int, alpha::Float64)
     g = simple_graph(k; is_directed=false)
     for P_k in P
         if P_k.p >= alpha
-            add_edge!(g, P_k.i, P_k.j) # methods are not distinguishable
+            for l in findall(r .== r[P_k.i])
+                add_edge!(g, l, P_k.j) # add edges for all methods with equal ranks
+            end
+            for l in findall(r .== r[P_k.j])
+                add_edge!(g, P_k.i, l)
+            end # methods with edges are not distinguishable
         end
     end
     return maximal_cliques(g)
