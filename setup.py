@@ -1,16 +1,11 @@
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
-class JuliaDependencies(install):
+class InstallJulia(install):
     def run(self):
         install.run(self)
         import julia
         julia.install()
-        julia.api.Julia(compiled_modules=False)
-
-        from julia import Pkg
-        Pkg.add("CriticalDifferenceDiagrams")
-        Pkg.add("Pandas")
 
 with open('README.md') as f:
     readme = f.read()
@@ -46,5 +41,5 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Machine Learning'
     ],
-    cmdclass={'install': JuliaDependencies}
+    cmdclass={'install': InstallJulia}
 )
