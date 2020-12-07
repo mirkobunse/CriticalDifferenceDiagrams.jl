@@ -4,7 +4,7 @@
 
 # Critical difference diagrams in Julia
 
-CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This Julia package generates Tikz code to produce publication-ready vector graphics.
+CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This Julia package generates Tikz code to produce publication-ready vector graphics. A wrapper for python in in the [py branch](https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/tree/py) of this repository.
 
 <img alt=".example.svg" src="./.example.svg" width="600">
 
