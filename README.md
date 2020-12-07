@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.com/mirkobunse/CriticalDifferenceDiagrams.jl.svg?branch=master)](https://travis-ci.com/mirkobunse/CriticalDifferenceDiagrams.jl)
+[![codecov](https://codecov.io/gh/mirkobunse/CriticalDifferenceDiagrams.jl/branch/master/graph/badge.svg?token=LWBUWCH8OQ)](https://codecov.io/gh/mirkobunse/CriticalDifferenceDiagrams.jl)
+
 
 # Critical difference diagrams in Julia
 
