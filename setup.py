@@ -10,9 +10,9 @@ class JuliaDependencies(install):
         Pkg.add("CriticalDifferenceDiagrams")
         Pkg.add("Pandas")
 
-with open('../README.md') as f:
+with open('README.md') as f:
     readme = f.read()
-with open('../LICENSE.md') as f:
+with open('LICENSE.md') as f:
     license = f.read()
 
 setup(

@@ -1,6 +1,6 @@
-# Python binding for plotting critical difference diagrams with Julia
+# Python binding for [CriticalDifferenceDiagrams.jl](https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl)
 
-CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This binding wraps [CriticalDifferenceDiagrams.jl](https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl), a Julia package which generates Tikz code to produce publication-ready vector graphics.
+CD diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). The Julia package behing this wrapper generates Tikz code to produce publication-ready vector graphics.
 
 <img alt=".example.svg" src="https://raw.githubusercontent.com/mirkobunse/CriticalDifferenceDiagrams.jl/master/.example.svg" width="600">
 
@@ -12,7 +12,7 @@ A CD diagram concisely represents multiple hypothesis tests that are conducted o
 ## Getting started
 
 ```
-pip install https://github.com/mirkobunse/CherenkovDeconvolution.py/archive/py.tar.gz
+pip install https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/archive/py.tar.gz
 ```
 
 Having installed the package, we can proceed with generating the plot:
