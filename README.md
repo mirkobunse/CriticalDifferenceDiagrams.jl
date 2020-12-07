@@ -6,7 +6,7 @@ CD diagrams are a powerful tool to compare outcomes of multiple treatments over 
 
 <img alt=".example.svg" src="./.example.svg" width="600">
 
-The above example is adapted from https://github.com/hfawaz/cd-diagram. The position of the treatments `clf1` to `clf5` represents their mean ranks across all outcomes of the observations, where low ranks indicate that a treatment wins more often than its competitors with higher ranks. Two or more treatments are connected with each other if we can not tell their outcomes apart, in the sense of statistical significance. For the above example, we can not tell from the data whether `clf3` and `clf5` are actually different from each other. We can tell, however, that both of them are different from all of the other treatments.
+The position of the treatments `clf1` to `clf5` represents their mean ranks across all outcomes of the observations, where low ranks indicate that a treatment wins more often than its competitors with higher ranks. Two or more treatments are connected with each other if we can not tell their outcomes apart, in the sense of statistical significance. For the above example, we can not tell from the data whether `clf3` and `clf5` are actually different from each other. We can tell, however, that both of them are different from all of the other treatments. The example above is adapted from https://github.com/hfawaz/cd-diagram.
 
 A CD diagram concisely represents multiple hypothesis tests that are conducted over the observed outcomes. Before anything is plotted at all, the Friedman test tells us whether there are significant differences at all. If this test fails, we have not sufficient data to tell any of the treatments apart and we must abort. If, however, the test sucessfully rejects this possibility we can proceed with the post-hoc analysis. In this second step, a Wilcoxon signed-rank test tells us whether each pair of treatments exhibits a significant difference. Since we are testing multiple hypotheses, we must adjust the Wilcoxon test with Holm's method. For each group of treatments which we can not distinguish from the Holm-adjusted Wilcoxon test, we add a thick line to the diagram.
 
@@ -14,7 +14,7 @@ A CD diagram concisely represents multiple hypothesis tests that are conducted o
 ## Getting started
 
 ```
-] add https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl
+] add CriticalDifferenceDiagrams
 ```
 
 Having installed the package, we can proceed with generating the plot:
@@ -34,6 +34,11 @@ plot = CriticalDifferenceDiagrams.plot(
     maximize_outcome=true, # compute ranks for minimization (default) or maximization
     title="CriticalDifferenceDiagrams.jl" # give an optional title
 )
+
+# configure the preamble of PGFPlots.jl (optional)
+pushPGFPlotsPreamble("""
+    \\usepackage{lmodern}
+""")
 
 # export to .svg, .tex, or .pdf
 PGFPlots.save("example.svg", plot)
