@@ -18,12 +18,12 @@ pip install https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/archive/
 Having installed the package, we can proceed with generating the plot:
 
 ```python
-import CriticalDifferenceDiagrams_jl as cdd
+import CriticalDifferenceDiagrams_jl as cdd # will take quite some time!
 import pandas as pd
-import wget
+from wget import download
 
 # we generate the above example from the underlying data
-wget("https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv")
+download("https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv")
 df = pd.read_csv("example.csv")
 
 plot = cdd.plot(
