@@ -6,6 +6,8 @@ class JuliaDependencies(install):
         install.run(self)
         import julia
         julia.install()
+        julia.api.Julia(compiled_modules=False)
+
         from julia import Pkg
         Pkg.add("CriticalDifferenceDiagrams")
         Pkg.add("Pandas")
