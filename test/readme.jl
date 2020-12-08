@@ -18,13 +18,16 @@
         \\usepackage{lmodern}
     """)
 
-    # export to svg; also possible are .tex and .pdf files
-    for ext in ["tex", "pdf", "svg"]
-        if !Sys.islinux() && ext != "tex"
-            @warn "Skipping the $ext export on $(Sys.KERNEL); only available on Linux"
-        else
-            PGFPlots.save("example.$ext", plot)
-            @test isfile("example.$ext")
-        end
+    # export to .tex; linux also supports .pdf and .svg files
+    extensions = ["tex"]
+    if Sys.islinux() && get(ENV, "TRAVIS_OS_NAME", "linux") == "linux"
+        @info "Adding linux-only tests" Sys.islinux() get(ENV, "TRAVIS_OS_NAME", "")
+        push!(extensions, "pdf", "svg")
+    else
+        @warn "Skipping linux-only tests" Sys.islinux() get(ENV, "TRAVIS_OS_NAME", "")
+    end
+    for ext in extensions
+        PGFPlots.save("example.$ext", plot)
+        @test isfile("example.$ext")
     end
 end
