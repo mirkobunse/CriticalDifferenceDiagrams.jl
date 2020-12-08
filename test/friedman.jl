@@ -7,6 +7,7 @@
     ] # http://calcscience.uwe.ac.uk/w2/am/Ch12/12_5_KWFriedman.pdf
 
     friedman = ChisqFriedmanTest(catalysts) # example 12.12
+    @info "catalysts example" friedman
     @test friedman.F ≈ 6.5
     @test pvalue(friedman) < 0.05 # reject that all are equal
     @test HypothesisTests.default_tail(friedman) == :right
@@ -15,6 +16,7 @@
     @test friedman.n == 4
 
     friedman = ChisqFriedmanTest(catalysts') # example 12.13
+    @info "transposed catalysts example" friedman
     @test friedman.F ≈ 7.4
     @test pvalue(friedman) >= 0.05
     @test HypothesisTests.default_tail(friedman) == :right
@@ -28,10 +30,22 @@
         [4, 2, 1, 1], # tree 3
         [2, 1, 2, 1] # tree 4
     ) # assignment Q12.8
+    @info "trees assignment" friedman
     @test friedman.F ≈ 9.525
     @test pvalue(friedman) < 0.05
     @test HypothesisTests.default_tail(friedman) == :right
     @test friedman.df == 3
     @test friedman.k == 4
     @test friedman.n == 4
+
+    fdist_friedman = FriedmanTest(
+        [6, 4, 3, 3],
+        [4, 3, 3, 2],
+        [4, 2, 1, 1],
+        [2, 1, 2, 1]
+    ) # FDistFriedmanTest
+    @info "trees assignment" fdist_friedman
+    @test pvalue(fdist_friedman) <= pvalue(friedman) # ChisqFriedmanTest is more conservative
+    @test average_ranks(fdist_friedman) == average_ranks(friedman)
+
 end
