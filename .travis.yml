@@ -1,7 +1,5 @@
 ## Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
-sudo: required
-dist: trusty
 julia:
   - 1.0
   - 1.5
@@ -13,8 +11,13 @@ git:
 jobs:
   allow_failures:
     - julia: nightly
-    - julia: 1.0
+    - os: windows
   include:
+    - os: linux
+      sudo: required
+      dist: trusty
+    - os: osx
+    - os: windows
     - stage: "Documentation"
       julia: 1.5
       os: linux
@@ -23,14 +26,10 @@ jobs:
         - julia --project=docs/ docs/make.jl
       after_success: skip
 
-# PDF and SVG export
+# PDF and SVG export (only on linux)
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y pdf2svg
-  - sudo apt-get install -y texlive-latex-base
-  - sudo apt-get install -y texlive-binaries
-  - sudo apt-get install -y texlive-pictures
-  - sudo apt-get install -y texlive-latex-extra
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; sudo apt-get -qq update ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; sudo apt-get install -y pdf2svg texlive-latex-base texlive-binaries texlive-pictures texlive-latex-extra ; fi
 
 # push coverage results to Codecov
 after_success:

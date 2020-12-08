@@ -20,7 +20,11 @@
 
     # export to svg; also possible are .tex and .pdf files
     for ext in ["tex", "pdf", "svg"]
-        PGFPlots.save("example.$ext", plot)
-        @test isfile("example.$ext")
+        if !Sys.islinux() && ext != "tex"
+            @warn "Skipping the $ext export on $(Sys.KERNEL); only available on Linux"
+        else
+            PGFPlots.save("example.$ext", plot)
+            @test isfile("example.$ext")
+        end
     end
 end
