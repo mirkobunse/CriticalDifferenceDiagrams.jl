@@ -1,5 +1,11 @@
 ## Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
+os:
+  - linux
+  - osx
+  - windows
+sudo: required
+dist: trusty
 julia:
   - 1.0
   - 1.5
@@ -13,11 +19,6 @@ jobs:
     - julia: nightly
     - os: windows
   include:
-    - os: linux
-      sudo: required
-      dist: trusty
-    - os: osx
-    - os: windows
     - stage: "Documentation"
       julia: 1.5
       os: linux
