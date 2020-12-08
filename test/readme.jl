@@ -1,4 +1,7 @@
-@assert success(`lualatex -v`) # make sure the PDF and SVG export will work
+if Sys.islinux() && get(ENV, "TRAVIS_OS_NAME", "linux") == "linux"
+    @info "Asserting that lualatex is installed" Sys.islinux() get(ENV, "TRAVIS_OS_NAME", "")
+    @assert success(`lualatex -v`) # make sure the PDF and SVG export will work
+end
 
 @testset "README.jl example" begin
     url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv"
