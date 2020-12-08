@@ -29,8 +29,8 @@ jobs:
 
 # PDF and SVG export (only on linux)
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; sudo apt-get -qq update ; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; sudo apt-get install -y pdf2svg texlive-latex-base texlive-binaries texlive-pictures texlive-latex-extra ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get -qq update; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y pdf2svg texlive-latex-base texlive-binaries texlive-pictures texlive-latex-extra; fi
 
 # push coverage results to Codecov
 after_success:
