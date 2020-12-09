@@ -6,23 +6,21 @@ class InstallJulia(install):
     def run(self):
         install.run(self)
 
-        print("Installing Julia (1/2): basic installation")
+        print("Installing Julia (1/4): basic installation")
         import julia
         julia.install()
 
-        print("Installing Julia (2/2): dependency packages")
+        print("Installing Julia (2/4): reloading")
         reload(julia) # reload required
         from julia.api import Julia
         jl = Julia(compiled_modules=False)
-
         from julia import Main
-        Main.eval("""
-            import Pkg
-            Pkg.activate(".")
-            Pkg.add(["CriticalDifferenceDiagrams", "Pandas"])
-            import CriticalDifferenceDiagrams, DataFrames, Pandas, PGFPlots
-        """)
-        print("Successfully installed Julia with dependencies")
+
+        print("Installing Julia (3/4): adding packages")
+        Main.eval("import Pkg; Pkg.add([\"CriticalDifferenceDiagrams\", \"Pandas\"])")
+
+        print("Installing Julia (4/4): precompilation")
+        Main.eval("import CriticalDifferenceDiagrams, Pandas")
 
 with open('README.md') as f:
     readme = f.read()

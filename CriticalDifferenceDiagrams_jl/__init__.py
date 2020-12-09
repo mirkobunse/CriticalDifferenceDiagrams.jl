@@ -3,9 +3,6 @@ jl = Julia(compiled_modules=False)
 
 from julia import Main
 Main.eval("""
-    import Pkg
-    Pkg.activate(".")
-
     import CriticalDifferenceDiagrams, DataFrames, Pandas, PGFPlots
 
     ranks_and_cliques(df::PyObject, treatment::String, observation::String, outcome::String; kwargs...) =
