@@ -5,7 +5,6 @@ from julia import Main
 Main.eval("""
     import Pkg
     Pkg.activate(".")
-    Pkg.add(["CriticalDifferenceDiagrams", "Pandas"])
 
     import CriticalDifferenceDiagrams, DataFrames, Pandas, PGFPlots
 

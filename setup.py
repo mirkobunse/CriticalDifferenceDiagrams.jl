@@ -1,11 +1,28 @@
+from importlib import reload
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
 class InstallJulia(install):
     def run(self):
         install.run(self)
+
+        print("Installing Julia (1/2): basic installation")
         import julia
         julia.install()
+
+        print("Installing Julia (2/2): dependency packages")
+        reload(julia) # reload required
+        from julia.api import Julia
+        jl = Julia(compiled_modules=False)
+
+        from julia import Main
+        Main.eval("""
+            import Pkg
+            Pkg.activate(".")
+            Pkg.add(["CriticalDifferenceDiagrams", "Pandas"])
+            import CriticalDifferenceDiagrams, DataFrames, Pandas, PGFPlots
+        """)
+        print("Successfully installed Julia with dependencies")
 
 with open('README.md') as f:
     readme = f.read()
