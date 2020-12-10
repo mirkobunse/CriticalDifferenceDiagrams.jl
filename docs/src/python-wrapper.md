@@ -5,7 +5,7 @@ The wrapper provides an interface through which the methods of CriticalDifferenc
 
 ## Getting started
 
-The wrapper can be installed with pip, which will take care that also the Julia backend is being installed.
+You need a working Julia installation on your system. To install Julia, please refer to [the official instructions](https://julialang.org/downloads/platform/#linux_and_freebsd). The wrapper, including all dependies, can then be installed with pip:
 
 ```
 pip install https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/archive/py.tar.gz
@@ -14,7 +14,7 @@ pip install https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/archive/
 The example plot from the [Home](@ref) section is then generated with the following Python code:
 
 ```python
-import CriticalDifferenceDiagrams_jl as cdd # will take quite some time!
+import CriticalDifferenceDiagrams_jl as cdd
 import pandas as pd
 from wget import download
 
@@ -41,4 +41,4 @@ cdd.save("example.svg", plot)
 
 ## Performance
 
-Importing `CriticalDifferenceDiagrams_jl` for the first time will be extraordinarily slow because the Julia dependencies need to be installed then. Subsequent imports will be significantly faster but still quite slow. The slow execution of each first method call is due to Julia's just-in-time (JIT) compilation mechanism. All functions are compiled when they are called for the first time in a session. As a result, the first call is super slow but subsequent calls are super fast. If your implementation design permits, generate multiple CD diagrams in each session, e.g. in batches or in the interactive mode of Python. Only then will you benefit from the JIT speedup of subsequent method calls.
+Importing the package and calling a method for the first time will be somewhat slow, due to Julia's just-in-time (JIT) compilation mechanism. JIT means that all functions are compiled when they are called for the first time in a session. As a result, the first call is super slow but subsequent calls are super fast. If your implementation design permits, generate multiple CD diagrams in each session to benefit from the JIT speedup of subsequent method calls.
