@@ -1,26 +1,39 @@
 from importlib import reload
 from setuptools import setup, find_packages
 from setuptools.command.install import install
+from shutil import copyfile
+import sys
 
 class InstallJulia(install):
     def run(self):
         install.run(self)
+        sysimage_path = self.install_lib + "CriticalDifferenceDiagrams_jl/sys.so"
+        script_path = self.install_lib + "CriticalDifferenceDiagrams_jl/precompile.jl"
+        print("Installing Julia: about to generate " + sysimage_path)
 
-        print("Installing Julia (1/4): basic installation")
+        print("Installing Julia (step 1/5): basic installation")
         import julia
         julia.install()
 
-        print("Installing Julia (2/4): reloading")
+        print("Installing Julia (step 2/5): reloading")
         reload(julia) # reload required
         from julia.api import Julia
         jl = Julia(compiled_modules=False)
         from julia import Main
 
-        print("Installing Julia (3/4): adding packages")
-        Main.eval("import Pkg; Pkg.add([\"CriticalDifferenceDiagrams\", \"Pandas\"])")
+        print("Installing Julia (step 3/5): adding packages")
+        Main.eval("""
+            using Pkg
+            Pkg.activate(".")
+            Pkg.add(["CriticalDifferenceDiagrams", "CSV", "DataFrames", "PackageCompiler", "Pandas", "PyCall"])
+        """)
 
-        print("Installing Julia (4/4): precompilation")
-        Main.eval("import CriticalDifferenceDiagrams, Pandas")
+        print("Installing Julia (step 4/5): building PyCall.jl")
+        Main.eval("ENV[\"PYTHON\"] = \"" + sys.executable + "\"; Pkg.build(\"PyCall\")")
+
+        print("Installing Julia (step 5/5): building the sysimage")
+        from julia.sysimage import build_sysimage
+        build_sysimage(sysimage_path, script=script_path, compiler_env=".")
 
 with open('README.md') as f:
     readme = f.read()
@@ -39,6 +52,7 @@ setup(
     packages=find_packages(exclude=('tests', 'docs')),
     tests_require=['pytest'],
     setup_requires=['pytest-runner'],
+    package_data={"": ["*.jl"]},
     install_requires=[
         'julia >= 0.5.6',
         'pandas >= 1.1.4'

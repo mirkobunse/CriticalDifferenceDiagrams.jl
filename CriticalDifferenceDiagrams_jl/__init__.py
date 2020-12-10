@@ -1,5 +1,10 @@
-from julia.api import Julia
-jl = Julia(compiled_modules=False)
+from pkg_resources import resource_filename
+print("Starting Julia from the sysimage " + resource_filename(__name__, "sys.so"))
+
+from julia.api import LibJulia
+api = LibJulia.load()
+api.sysimage = resource_filename(__name__, "sys.so")
+api.init_julia()
 
 from julia import Main
 Main.eval("""
