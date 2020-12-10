@@ -2,12 +2,20 @@ from importlib import reload
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 from shutil import copyfile
-import sys
+import platform, sys
 
 class InstallJulia(install):
     def run(self):
         install.run(self)
-        sysimage_path = self.install_lib + "CriticalDifferenceDiagrams_jl/sys.so"
+        if platform.system() == "Linux":
+            ext = "so"
+        elif platform.system() == "Darwin":
+            ext = "dylib"
+        elif platform.system() == "Windows":
+            ext = "dll"
+        else:
+            raise ValueError("Can't install on system " + platform.system())
+        sysimage_path = self.install_lib + "CriticalDifferenceDiagrams_jl/sys." + ext
         script_path = self.install_lib + "CriticalDifferenceDiagrams_jl/precompile.jl"
         print("Installing Julia: about to generate " + sysimage_path)
 

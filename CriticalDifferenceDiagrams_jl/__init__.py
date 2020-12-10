@@ -1,9 +1,19 @@
 from pkg_resources import resource_filename
-print("Starting Julia from the sysimage " + resource_filename(__name__, "sys.so"))
+import platform
+if platform.system() == "Linux":
+    ext = "so"
+elif platform.system() == "Darwin":
+    ext = "dylib"
+elif platform.system() == "Windows":
+    ext = "dll"
+else:
+    raise ValueError("Can't install on system " + platform.system())
+sysimage_path = resource_filename(__name__, "sys." + ext)
+print("Starting Julia from the sysimage " + sysimage_path)
 
 from julia.api import LibJulia
 api = LibJulia.load()
-api.sysimage = resource_filename(__name__, "sys.so")
+api.sysimage = sysimage_path
 api.init_julia()
 
 from julia import Main
