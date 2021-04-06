@@ -29,8 +29,6 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - name: Install TexLive
-        run: sudo apt-get install pdf2svg texlive-latex-base texlive-binaries texlive-pictures texlive-latex-extra texlive-luatex
       - uses: actions/cache@v2
         env:
           cache-name: cache-artifacts
@@ -42,6 +40,8 @@ jobs:
             ${{ runner.os }}-${{ matrix.arch }}-test-
             ${{ runner.os }}-${{ matrix.arch }}-
             ${{ runner.os }}-
+      - name: Install TexLive
+        run: sudo apt-get install pdf2svg texlive-latex-base texlive-binaries texlive-pictures texlive-latex-extra texlive-luatex
       - uses: julia-actions/julia-buildpkg@latest
       - run: |
           git config --global user.name Tester
