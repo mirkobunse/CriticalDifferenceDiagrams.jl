@@ -1,6 +1,6 @@
 #
 # CriticalDifferenceDiagrams.jl
-# Copyright 2020 Mirko Bunse
+# Copyright 2020-2021 Mirko Bunse
 #
 #
 # Plot CD diagrams in Julia.
