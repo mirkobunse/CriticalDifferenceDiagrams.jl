@@ -59,6 +59,20 @@ $(_DOC)
 - `title=nothing` is an optional string to be printed above the diagram.
 - `reverse_x=false` reverses the direction of the x axis from right-to-left (default) to
   left-to-right.
+
+# 2-dimensional sequences of CD diagrams
+
+You can arrange a sequence of CD diagrams in a single 2-dimensional axis. In the following,
+each item in the sequence consists of a pair `s_i => [args_i...]` of the item's name `s_i`
+and the regular CD diagram arguments `args_i...` that are documented above.
+
+    plot(
+        s_1 => [t_11 => x_11, t_12 => x_12, ..., t_1k =>  x_1k],
+        s_2 => [t_21 => x_21, t_22 => x_22, ..., t_2k =>  x_2k],
+        ...,
+        s_j => [t_j1 => x_j1, t_j2 => x_j2, ..., t_jk =>  x_jk];
+        kwargs...
+    )
 """
 function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, reverse_x::Bool=false, kwargs...) where T <: AbstractVector
     treatments, outcomes = collect.(zip(x...)) # separate the pairs
@@ -95,6 +109,54 @@ function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, rever
     return a
 end
 
+# 2-dimensional version with a sequence of CD diagrams
+function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, reverse_x::Bool=false, kwargs...) where {S <: AbstractVector, T <: AbstractVector{Pair{String, S}}}
+    seq_names, seq_data = collect.(zip(x...)) # separate the pairs of the 2d sequence
+
+    # collect ranks and cliques of each element in the sequence
+    treatments = String[]
+    ranks = Vector{Float64}[]
+    cliques = Vector{Vector{Int}}[]
+    for (i, x_i) in enumerate(seq_data)
+        t_i, o_i = collect.(zip(x_i...))
+        if i == 1
+            treatments = t_i
+        elseif t_i != treatments
+            throw(ValueError("Treatments differ between sequence elements; also check their order!"))
+        end
+        r_i, c_i = ranks_and_cliques(o_i...; kwargs...)
+        push!(ranks, r_i)
+        push!(cliques, c_i)
+    end
+    k = length(treatments)
+
+    # draw ranks along the sequence
+    a = Axis(style = _2d_axis_style(k, seq_names, reverse_x), title=title)
+    for i in 1:k
+        push!(a, Plots.Linear(
+            [ r[i] for r in ranks ], # x coordinates
+            1:length(seq_names); # y coordinates
+            legendentry = treatments[i],
+            style = "only marks"
+        ))
+    end
+
+    # draw cliques
+    for i in 1:length(ranks)
+        r_i = ranks[i]
+        c_i = cliques[i]
+        for j in 1:length(c_i)
+            push!(a, _2d_clique_command(
+                minimum(r_i[c_i[j]]),
+                maximum(r_i[c_i[j]]),
+                i + (j+.5) / (1.5*length(c_i)+1)
+            ))
+        end
+    end
+
+    return a
+end
+
 _axis_style(k::Int, changepoint::Int, reverse_x::Bool) =
     join([
         "axis x line=center",
@@ -128,6 +190,36 @@ _label_anchor(xpos::Float64, reverse_x::Bool) = ["west", "east"][1 + (Int(xpos==
 _clique_command(minrank::Float64, maxrank::Float64, ypos::Float64) =
     Plots.Command(join([
         "\\draw[ultra thick, line cap=round] (axis cs:$minrank, -$ypos) -- (axis cs:$maxrank, -$ypos)"
+    ]))
+
+# 2-dimensional sequence versions
+_2d_axis_style(k::Int, seq_names::AbstractVector{String}, reverse_x::Bool) =
+    join([
+        "title style={yshift=2\\baselineskip}",
+        "y dir=reverse",
+        "ytick={$(join(1:length(seq_names), ","))}",
+        "yticklabels={$(join(map(x -> "{$x}", seq_names), ","))}",
+        "xlabel={avg. rank}",
+        "xlabel style={at={([yshift=-1pt]1,1)}, anchor=south west}",
+        "grid=both",
+        "axis line style={draw=none}",
+        "tick style={draw=none}",
+        "xticklabel pos=upper",
+        "xmin=.5",
+        "xmax=$(k).5",
+        "ymin=.66",
+        "ymax=$(length(seq_names) + .66)",
+        "clip=false",
+        "legend style={draw=none,fill=none,at={(1.1,.5)},anchor=west,row sep=.25em}"
+    ], ", ") *
+      (reverse_x ? "" : ", x dir=reverse")
+_2d_clique_command(minrank::Float64, maxrank::Float64, ypos::Float64) =
+    Plots.Command(join([
+      "\\draw[semithick]",
+      " ([yshift=2pt]axis cs:$minrank, $ypos) --",
+      " ++(0pt, -2pt) --",
+      " (axis cs:$maxrank, $ypos) --",
+      " ++(0pt, 2pt)",
     ]))
 
 """
