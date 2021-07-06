@@ -155,7 +155,8 @@ function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_o
     # test whether there are differences at all
     friedman = FriedmanTest(X; maximize_outcome=maximize_outcome)
     if pvalue(friedman) >= alpha
-        error("No significant differences between treatments at α=$alpha")
+        @error "Friedman cannot find significant differences between treatments at α=$alpha"
+        return average_ranks(friedman), [collect(1:size(X, 2))]
     end
 
     # adjust pair-wise Wilcoxon signed-rank tests with Holm's method
