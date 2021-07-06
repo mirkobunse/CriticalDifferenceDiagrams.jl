@@ -9,4 +9,8 @@ Critical difference (CD) diagrams are a powerful tool to compare outcomes of mul
 
 <img alt="docs/src/assets/example.svg" src="docs/src/assets/example.svg" width="480">
 
+You can also generate sequences of CD diagrams, which are arranged in a single 2-dimensional axis.
+
+<img alt="docs/src/assets/2d_example.svg" src="docs/src/assets/2d_example.svg" width="480">
+
 For more information, please refer to [the documentation](https://mirkobunse.github.io/CriticalDifferenceDiagrams.jl/dev).

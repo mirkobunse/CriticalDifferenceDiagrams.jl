@@ -55,6 +55,15 @@ PGFPlots.save("example.svg", plot)
 The hypothesis tests underneath the CD diagram do not account for variances of the outcomes. It is therefore important that these outcomes are "reliable" in the sense that each of them is obtained from a sufficiently large sample. Ideally, they come from a cross validation or from a repeated stratified split. Moreover, all treatments must have been evaluated on the same set of observations.
 
 
+## 2-dimensional sequences of CD diagrams
+
+The [API reference](@ref) of the `plot` method provides additional information on how to generate sequences of CD diagrams, which are arranged in a single 2-dimensional axis.
+
+```@raw html
+<img alt="assets/2d_example.svg" src="assets/2d_example.svg" style="width: 480px; max-width: 100%; margin: 2em auto; display: block;">
+```
+
+
 ## Citing
 
 CD diagrams have originally been proposed in the following article:
