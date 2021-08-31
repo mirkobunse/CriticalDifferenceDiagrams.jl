@@ -122,7 +122,8 @@ function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, rever
         if i == 1
             treatments = t_i
         elseif t_i != treatments
-            throw(ValueError("Treatments differ between sequence elements; also check their order!"))
+            @error "Treatments differ between sequence elements $(seq_names[1]) and $(seq_names[i])" treatments t_i
+            throw(ArgumentError("Treatments differ between sequence elements; also check their order!"))
         end
         r_i, c_i = ranks_and_cliques(o_i...; kwargs...)
         push!(ranks, r_i)
