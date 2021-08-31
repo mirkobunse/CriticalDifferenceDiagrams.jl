@@ -125,7 +125,7 @@ function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, rever
             @error "Treatments differ between sequence elements $(seq_names[1]) and $(seq_names[i])" treatments t_i
             throw(ArgumentError("Treatments differ between sequence elements; also check their order!"))
         end
-        r_i, c_i = ranks_and_cliques(o_i...; kwargs...)
+        r_i, c_i = ranks_and_cliques(o_i...; seq_name=seq_names[i], kwargs...)
         push!(ranks, r_i)
         push!(cliques, c_i)
     end
@@ -244,11 +244,15 @@ end
 ranks_and_cliques(x::AbstractVector{T}...; kwargs...) where T <: Real =
     ranks_and_cliques(hcat(x...); kwargs...)
 
-function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_outcome::Bool=false) where T <: Real
+function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_outcome::Bool=false, seq_name::String="") where T <: Real
     # test whether there are differences at all
     friedman = FriedmanTest(X; maximize_outcome=maximize_outcome)
     if pvalue(friedman) >= alpha
-        @error "Friedman cannot find significant differences between treatments at α=$alpha"
+        if seq_name != ""
+            @error "Friedman cannot find significant differences between treatments at α=$alpha ($(seq_name))"
+        else
+            @error "Friedman cannot find significant differences between treatments at α=$alpha"
+        end
         return average_ranks(friedman), [collect(1:size(X, 2))]
     end
 
