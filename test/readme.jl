@@ -2,7 +2,7 @@
 
 @testset "README.jl example" begin
     url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv"
-    df = CSV.read(download(url), DataFrame)
+    df = CSV.read(Downloads.download(url), DataFrame)
 
     plot = CriticalDifferenceDiagrams.plot(
         df,

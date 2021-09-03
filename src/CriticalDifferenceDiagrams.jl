@@ -77,6 +77,7 @@ and the regular CD diagram arguments `args_i...` that are documented above.
 function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, reverse_x::Bool=false, kwargs...) where T <: AbstractVector
     treatments, outcomes = collect.(zip(x...)) # separate the pairs
     ranks, cliques = ranks_and_cliques(outcomes...; kwargs...)
+    cliques = filter(c_i -> length(c_i) > 1, cliques) # only plot cliques of size >= 2
     k = length(treatments)
     c = length(cliques)
 
@@ -145,7 +146,7 @@ function plot(x::Pair{String, T}...; title::Union{String,Nothing}=nothing, rever
     # draw cliques
     for i in 1:length(ranks)
         r_i = ranks[i]
-        c_i = cliques[i]
+        c_i = filter(c_j -> length(c_j) > 1, cliques[i])
         for j in 1:length(c_i)
             push!(a, _2d_clique_command(
                 minimum(r_i[c_i[j]]),

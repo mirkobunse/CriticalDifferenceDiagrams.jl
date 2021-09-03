@@ -1,11 +1,11 @@
-using CriticalDifferenceDiagrams, CSV, DataFrames, HypothesisTests, PGFPlots, Test
+using CriticalDifferenceDiagrams, CSV, DataFrames, Downloads, HypothesisTests, PGFPlots, Test
 
 include("friedman.jl")
 
 # download and read a test data set and remove the intermediate file
 function _getdata(url="https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv")
     @info "Downloading $url"
-    testfile = download(url)
+    testfile = Downloads.download(url)
     df = CSV.read(testfile, DataFrame)
     rm(testfile)
     return df, :classifier_name, :dataset_name, :accuracy # = (df, treatment, observation, outcome)
