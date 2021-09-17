@@ -3,13 +3,17 @@
 [![codecov](https://codecov.io/gh/mirkobunse/CriticalDifferenceDiagrams.jl/branch/master/graph/badge.svg?token=LWBUWCH8OQ)](https://codecov.io/gh/mirkobunse/CriticalDifferenceDiagrams.jl)
 
 
-# Critical difference diagrams in Julia
+# [Critical difference diagrams in Julia](https://mirkobunse.github.io/CriticalDifferenceDiagrams.jl/dev)
 
-Critical difference (CD) diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (outcome) of multiple methods (treatments) over multiple data sets (observations). This Julia package generates Tikz code to produce publication-ready vector graphics. A wrapper for Python is also available.
+This package generates Tikz code for publication-ready vector graphics.
+
+Critical difference (CD) diagrams are a powerful tool to compare outcomes of multiple treatments over multiple observations. For instance, in machine learning research we often compare the performance (= outcome) of multiple methods (= treatments) over multiple data sets (= observations). A wrapper for Python is also available.
+
+**Regular CD diagrams:** indistinguishable methods are connected.
 
 <img alt="docs/src/assets/example.svg" src="docs/src/assets/example.svg" width="480">
 
-You can also generate sequences of CD diagrams, which are arranged in a single 2-dimensional axis.
+**2D sequences:** sequences of multiple CD diagrams can be arranged in a single 2-dimensional axis.
 
 <img alt="docs/src/assets/2d_example.svg" src="docs/src/assets/2d_example.svg" width="480">
 
