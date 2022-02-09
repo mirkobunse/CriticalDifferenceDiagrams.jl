@@ -8,5 +8,5 @@ plot(df::AbstractDataFrame, treatment::Symbol, observation::Symbol, outcome::Sym
 
 _to_pairs(df::AbstractDataFrame, treatment::Symbol, observation::Symbol, outcome::Symbol) =
     map(pairs(groupby(sort(df, observation), treatment))) do (key, group)
-        key[treatment] => group[!, outcome]
+        String(key[treatment]) => group[!, outcome]
     end # map from treatment name to all outcomes, which appear in the same order
