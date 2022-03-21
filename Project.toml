@@ -14,9 +14,9 @@ Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-DataFrames = "0.21 - 1.3"
+DataFrames = "0.21, 0.22, 1.0 - 1.3"
 Distributions = "0.23 - 0.25"
-Graphs = "0.10 - 1.6"
+Graphs = "1.4 - 1.6"
 HypothesisTests = "0.10"
 MultipleTesting = "0.4 - 0.5"
 PGFPlots = "3.3 - 3.4"
