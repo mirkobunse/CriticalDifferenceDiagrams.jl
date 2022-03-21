@@ -28,7 +28,7 @@ The example plot above is then generated with the following code:
 using CriticalDifferenceDiagrams, CSV, DataFrames, Downloads, PGFPlots
 
 # we generate the above example from the underlying data
-url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv"
+url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/main/example.csv"
 df = CSV.read(Downloads.download(url), DataFrame)
 
 plot = CriticalDifferenceDiagrams.plot(

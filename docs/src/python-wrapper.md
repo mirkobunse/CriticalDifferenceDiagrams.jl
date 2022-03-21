@@ -19,7 +19,7 @@ import pandas as pd
 from wget import download
 
 # we generate the above example from the underlying data
-download("https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv")
+download("https://raw.githubusercontent.com/hfawaz/cd-diagram/main/example.csv")
 df = pd.read_csv("example.csv")
 
 plot = cdd.plot(
