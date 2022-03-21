@@ -1,7 +1,7 @@
 @assert success(`lualatex -v`) # make sure the PDF and SVG export will work
 
 @testset "README.jl example" begin
-    url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/main/example.csv"
+    url = "https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv"
     df = CSV.read(Downloads.download(url), DataFrame)
 
     plot = CriticalDifferenceDiagrams.plot(

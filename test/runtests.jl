@@ -3,7 +3,7 @@ using CriticalDifferenceDiagrams, CSV, DataFrames, Downloads, HypothesisTests, P
 include("friedman.jl")
 
 # download and read a test data set and remove the intermediate file
-function _getdata(url="https://raw.githubusercontent.com/hfawaz/cd-diagram/main/example.csv")
+function _getdata(url="https://raw.githubusercontent.com/hfawaz/cd-diagram/master/example.csv")
     @info "Downloading $url"
     testfile = Downloads.download(url)
     df = CSV.read(testfile, DataFrame)
