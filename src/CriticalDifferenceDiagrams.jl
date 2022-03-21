@@ -270,7 +270,7 @@ end
 const _PairwiseTest = NamedTuple{(:i, :j, :p),Tuple{Int64,Int64,Float64}} # type alias
 
 function _indistinguishable_cliques(r::Vector{Float64}, P::Vector{_PairwiseTest}, k::Int, alpha::Float64)
-    g = simple_graph(k; is_directed=false)
+    g = SimpleGraph(k)
     for P_k in P
         if P_k.p >= alpha
             for l in findall(r .== r[P_k.i])
