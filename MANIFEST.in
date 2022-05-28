@@ -1,0 +1,2 @@
+include README.md
+include CriticalDifferenceDiagrams_jl/Project.toml

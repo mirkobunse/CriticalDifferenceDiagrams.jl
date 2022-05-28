@@ -1,8 +1,4 @@
 [deps]
-CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CriticalDifferenceDiagrams = "e3dcb5d8-23d5-4a0a-a175-b3f280ae1849"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 PGFPlots = "3b7a836e-365b-5785-a47d-02c71176b4aa"
-PackageCompiler = "9b87118b-4619-50d2-8e1e-99f35a4d4d9d"
-Pandas = "eadc2687-ae89-51f9-a5d9-86b5a6373a9c"
-PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"

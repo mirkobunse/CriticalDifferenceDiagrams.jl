@@ -22,7 +22,6 @@ setup(
         'pandas',
     ],
     include_package_data=True,
-    package_data={"": ["*.jl"]},
     zip_safe=False,
     test_suite='nose.collector',
     extras_require={
