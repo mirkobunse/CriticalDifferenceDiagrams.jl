@@ -24,3 +24,4 @@ end
 end
 
 include("readme.jl")
+include("2d.jl")
