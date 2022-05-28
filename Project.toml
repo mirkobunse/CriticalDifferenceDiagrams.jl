@@ -1,7 +1,7 @@
 name = "CriticalDifferenceDiagrams"
 uuid = "e3dcb5d8-23d5-4a0a-a175-b3f280ae1849"
 authors = ["Mirko Bunse <mirko.bunse@cs.tu-dortmund.de>"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
