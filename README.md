@@ -79,3 +79,12 @@ are more appropriate for the post-hoc assessment of the pairwise differences:
   year={2016}
 }
 ```
+
+
+# Development and unit testing
+
+The installation and unit tests are taken out through a Docker build.
+
+```
+docker build .
+```

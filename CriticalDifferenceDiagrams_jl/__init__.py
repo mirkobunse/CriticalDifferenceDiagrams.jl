@@ -1,28 +1,23 @@
-from pkg_resources import resource_filename
-import platform
-if platform.system() == "Linux":
-    ext = "so"
-elif platform.system() == "Darwin":
-    ext = "dylib"
-elif platform.system() == "Windows":
-    ext = "dll"
-else:
-    raise ValueError("Can't install on system " + platform.system())
-sysimage_path = resource_filename(__name__, "sys." + ext)
-print("Starting Julia from the sysimage " + sysimage_path)
+from julia_project import JuliaProject
+from os.path import dirname, abspath
 
-from julia.api import LibJulia
-api = LibJulia.load()
-api.sysimage = sysimage_path
-api.init_julia()
+# initialize the Julia project
+project = JuliaProject(
+    name = "CriticalDifferenceDiagrams_jl",
+    package_path = dirname(abspath(__file__)),
+)
+project.ensure_init(depot=True, compile=False, install_julia=False)
 
-from julia import Main
-Main.eval("""
-    import CriticalDifferenceDiagrams, DataFrames, Pandas, PGFPlots
+# evaluate the Julia side of the wrapper
+project.julia.Main.eval("""
+    import CriticalDifferenceDiagrams, DataFrames, PGFPlots
+
+    pandas_to_julia(df::PyObject) =
+        DataFrames.DataFrame(; map(c -> Symbol(c) => df[c].to_list(), df.columns)...)
 
     ranks_and_cliques(df::PyObject, treatment::String, observation::String, outcome::String; kwargs...) =
         CriticalDifferenceDiagrams.ranks_and_cliques(
-            DataFrames.DataFrame(Pandas.DataFrame(df)),
+            pandas_to_julia(df),
             Symbol(treatment),
             Symbol(observation),
             Symbol(outcome);
@@ -31,27 +26,28 @@ Main.eval("""
 
     plot(df::PyObject, treatment::String, observation::String, outcome::String; kwargs...) =
         CriticalDifferenceDiagrams.plot(
-            DataFrames.DataFrame(Pandas.DataFrame(df)),
+            pandas_to_julia(df),
             Symbol(treatment),
             Symbol(observation),
             Symbol(outcome);
             kwargs...
         )
-    
+
     save(outpath::String, plot::PGFPlots.Axis; kwargs...) =
         PGFPlots.save(outpath, plot; kwargs...)
 
     pushPGFPlotsPreamble(x::String) = PGFPlots.pushPGFPlotsPreamble(x)
 """)
 
+# define the Python side of the wrapper
 def ranks_and_cliques(df, treatment, observation, outcome, **kwargs):
-    return Main.ranks_and_cliques(df, treatment, observation, outcome, **kwargs)
+    return project.julia.Main.ranks_and_cliques(df, treatment, observation, outcome, **kwargs)
 
 def plot(df, treatment, observation, outcome, **kwargs):
-    return Main.plot(df, treatment, observation, outcome, **kwargs)
+    return project.julia.Main.plot(df, treatment, observation, outcome, **kwargs)
 
 def save(outpath, plot, **kwargs):
-    return Main.save(outpath, plot, **kwargs)
+    return project.julia.Main.save(outpath, plot, **kwargs)
 
 def pushPGFPlotsPreamble(x):
-    return Main.pushPGFPlotsPreamble(x)
+    return project.julia.Main.pushPGFPlotsPreamble(x)
