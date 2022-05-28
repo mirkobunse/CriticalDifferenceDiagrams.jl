@@ -67,11 +67,11 @@ You create a 2-dimensional sequence of CD diagrams by calling the `plot` functio
 
 ```julia
 sequence = Pair{String, Vector{Pair{String, Vector}}}[]
-push!(sequence, "A" => CriticalDifferenceDiagrams.to_pairs(
-    CSV.read(file1, DataFrame), :method, :dataset, :accuracy
+push!(sequence, "title 1" => CriticalDifferenceDiagrams.to_pairs(
+    df1, :treatment, :dataset, :outcome
 ))
-push!(sequence, "B" => CriticalDifferenceDiagrams.to_pairs(
-    CSV.read(file2, DataFrame), :method, :dataset, :accuracy
+push!(sequence, "title 2" => CriticalDifferenceDiagrams.to_pairs(
+    df2, :treatment, :dataset, :outcome
 ))
 plot = CriticalDifferenceDiagrams.plot(sequence...; maximize_outcome=true)
 ```

@@ -41,6 +41,16 @@ cdd.pushPGFPlotsPreamble("\\usepackage{lmodern}")
 cdd.save("example.svg", plot)
 ```
 
+A 2-dimensional plot can be generated in analogy to the example from the [Home](@ref) section:
+
+```python
+sequence = [
+    ("title 1", cdd.to_pairs(df1, "treatment", "dataset", "outcome")),
+    ("title 2", cdd.to_pairs(df2, "treatment", "dataset", "outcome"))
+]
+plot = cdd.plot(sequence, maximize_outcome=True, title="2-dimensional")
+```
+
 
 ## Performance
 
