@@ -1,4 +1,4 @@
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://mirkobunse.github.io/CriticalDifferenceDiagrams.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://mirkobunse.github.io/CriticalDifferenceDiagrams.jl/dev)
 [![Build Status](https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/workflows/CI/badge.svg)](https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/actions)
 [![codecov](https://codecov.io/gh/mirkobunse/CriticalDifferenceDiagrams.jl/branch/main/graph/badge.svg?token=LWBUWCH8OQ)](https://codecov.io/gh/mirkobunse/CriticalDifferenceDiagrams.jl)
 
