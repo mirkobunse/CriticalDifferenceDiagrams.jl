@@ -5,11 +5,14 @@ The wrapper provides an interface through which the methods of CriticalDifferenc
 
 ## Getting started
 
-You need a working Julia installation on your system. To install Julia, please refer to [the official instructions](https://julialang.org/downloads/platform/#linux_and_freebsd). The wrapper, including all dependies, can then be installed with pip:
+The wrapper can be installed with pip:
 
 ```
 pip install https://github.com/mirkobunse/CriticalDifferenceDiagrams.jl/archive/py.tar.gz
+python -c "import CriticalDifferenceDiagrams_jl"
 ```
+
+The second step ensures that all Julia dependencies, including Julia itself, are installed.
 
 The example plot from the [Home](@ref) section is then generated with the following Python code:
 
@@ -41,4 +44,12 @@ cdd.save("example.svg", plot)
 
 ## Performance
 
-Importing the package and calling a method for the first time will be somewhat slow, due to Julia's just-in-time (JIT) compilation mechanism. JIT means that all functions are compiled when they are called for the first time in a session. As a result, the first call is super slow but subsequent calls are super fast. If your implementation design permits, generate multiple CD diagrams in each session to benefit from the JIT speedup of subsequent method calls.
+The first `import CriticalDifferenceDiagrams_jl` installs all Julia dependencies, which takes some time. Therefore, we recommend to call
+
+```
+python -c "import CriticalDifferenceDiagrams_jl"
+```
+
+as a part of the installation process, as described in the [Getting started](#Getting-started) section.
+
+Calling a method for the first time will be somewhat slow, due to Julia's just-in-time (JIT) compilation mechanism. JIT means that all functions are compiled when they are called for the first time in a session. As a result, the first call is quite slow but subsequent calls are super fast. If your implementation design permits, generate multiple CD diagrams in a single session to benefit from the JIT speedup of subsequent method calls.
