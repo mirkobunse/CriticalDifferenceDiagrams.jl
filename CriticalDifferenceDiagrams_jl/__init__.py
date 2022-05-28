@@ -5,8 +5,9 @@ from os.path import dirname, abspath
 project = JuliaProject(
     name = "CriticalDifferenceDiagrams_jl",
     package_path = dirname(abspath(__file__)),
+    version_spec = "= 1.6.5",
 )
-project.ensure_init(depot=True, compile=False, install_julia=False)
+project.ensure_init(install_julia=True, depot=True, compile=False)
 
 # evaluate the Julia side of the wrapper
 project.julia.Main.eval("""
