@@ -57,12 +57,26 @@ The hypothesis tests underneath the CD diagram do not account for variances of t
 
 ## 2-dimensional sequences of CD diagrams
 
-The [API reference](@ref) of the `plot` method provides additional information on how to generate sequences of CD diagrams, which are arranged in a single 2-dimensional axis.
+You can arrange a series of CD diagrams in a single 2-dimensional axis. Each row in such a plot is a separate CD diagram.
 
 ```@raw html
 <img alt="assets/2d_example.svg" src="assets/2d_example.svg" style="width: 480px; max-width: 100%; margin: 2em auto; display: block;">
 ```
 
+You create a 2-dimensional sequence of CD diagrams by calling the `plot` function on a sequence of `(title, data)` pairs. The data consists of the same pairs that a 1-dimensional CD diagram would use.
+
+```julia
+sequence = Pair{String, Vector{Pair{String, Vector}}}[]
+push!(sequence, "A" => CriticalDifferenceDiagrams.to_pairs(
+    CSV.read(file1, DataFrame), :method, :dataset, :accuracy
+))
+push!(sequence, "B" => CriticalDifferenceDiagrams.to_pairs(
+    CSV.read(file2, DataFrame), :method, :dataset, :accuracy
+))
+plot = CriticalDifferenceDiagrams.plot(sequence...; maximize_outcome=true)
+```
+
+The [API reference](@ref) of the `plot` method provides additional information on how to generate sequences of CD diagrams, which are arranged in a single 2-dimensional axis.
 
 ## Citing
 
