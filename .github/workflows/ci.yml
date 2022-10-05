@@ -39,8 +39,10 @@ jobs:
             ${{ runner.os }}-${{ matrix.arch }}-test-
             ${{ runner.os }}-${{ matrix.arch }}-
             ${{ runner.os }}-
+      - name: Update packages
+        run: sudo apt-get update
       - name: Install TexLive
-        run: sudo apt-get install pdf2svg texlive-latex-base texlive-binaries texlive-pictures texlive-latex-extra texlive-luatex
+        run: sudo apt-get install --fix-missing pdf2svg texlive-latex-base texlive-binaries texlive-pictures texlive-latex-extra texlive-luatex
       - uses: julia-actions/julia-buildpkg@latest
       - run: |
           git config --global user.name Tester
