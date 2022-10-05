@@ -37,15 +37,16 @@ Alternatively, you can provide a DataFrame `df` with the columns `treatment`, `o
 and `outcome`.
 
 The analysis starts with a `FriedmanTest` to check if any of the treatments differ. If so,
-the differences between each pair of treatments is checked with a Holm-adjusted Wilcoxon
-`SignedRankTest`. The cliques represent groups of treatments which are not significantly
-distinguishable from each other.
+the differences between each pair of treatments is checked with a Holm-adjusted or
+Bonferroni-adjusted Wilcoxon `SignedRankTest`. The cliques represent groups of treatments
+which are not significantly distinguishable from each other.
 
 # kwargs
 
 - `alpha=0.05` is the significance level in the hypothesis tests.
 - `maximize_outcome=false` specifies whether the ranks represent a maximization or a
   minimization of the outcomes.
+- `adjustment=:holm` specifies the adjustment method (`:holm` or `:bonferroni`).
 """ # basic documentation
 
 """
@@ -245,7 +246,12 @@ end
 ranks_and_cliques(x::AbstractVector{T}...; kwargs...) where T <: Real =
     ranks_and_cliques(hcat(x...); kwargs...)
 
-function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_outcome::Bool=false, seq_name::String="") where T <: Real
+const ADJUSTMENTS = Dict(
+    :holm => Holm(),
+    :bonferroni => Bonferroni(),
+)
+
+function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_outcome::Bool=false, adjustment::Symbol=:holm, seq_name::String="") where T <: Real
     # test whether there are differences at all
     friedman = FriedmanTest(X; maximize_outcome=maximize_outcome)
     if pvalue(friedman) >= alpha
@@ -257,10 +263,10 @@ function ranks_and_cliques(X::AbstractMatrix{T}; alpha::Float64=0.05, maximize_o
         return average_ranks(friedman), [collect(1:size(X, 2))]
     end
 
-    # adjust pair-wise Wilcoxon signed-rank tests with Holm's method
+    # adjust the pair-wise Wilcoxon signed-rank tests
     P = _adjust_pairwise_tests!(
         _pairwise_tests(X, SignedRankTest),
-        Holm()
+        ADJUSTMENTS[adjustment]
     )
 
     # find max-cliques of indistinguishable methods
