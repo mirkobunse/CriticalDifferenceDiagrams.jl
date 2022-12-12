@@ -14,4 +14,5 @@ makedocs(;
 
 deploydocs(
     repo = "github.com/mirkobunse/CriticalDifferenceDiagrams.jl.git",
+    devbranch = "main"
 )
